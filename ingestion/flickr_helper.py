@@ -62,6 +62,7 @@ def GetPhotoIDs_iter(**kwargs):
 
 def GetPhotoIDs_batch_iter(ctime_values, interval=60):
     for ctime in ctime_values:
+        print ctime
         min_taken_date = ctime
         max_taken_date = ctime+interval
 
@@ -99,13 +100,13 @@ def photo_id2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(se
 if __name__ == '__main__':
     # WriteFiles(photo_id='16661925622')
     ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
-    ctime_length = 60*60
+    ctime_length = 60
     ctime_interval = 60
     ctime_mod = 1
     for photo_id in GetPhotoIDs_batch_iter(range(ctime_start,
                                                  ctime_start+ctime_length,
                                                  ctime_interval*ctime_interval),
                                            interval=ctime_interval):
-        print photo_id
+        print '.',
 
 

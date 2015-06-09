@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import threading
-# import logging
+import logging
 import time
-import flickr_helper
+from flickr_helper import GetPhotoIDs_batch_iter
 
 from kafka.client import KafkaClient
 from kafka.producer import SimpleProducer
@@ -21,12 +21,14 @@ class Producer(threading.Thread):
             ctime_interval = 60
             ctime_mod = 1
 
-            for photo_id in GetPhotoIDs_batch_iter(range(ctime_start,
-                                                         ctime_start+ctime_length,
-                                                         ctime_interval*ctime_interval),
-                                                   interval=ctime_interval):
+            for i,photo_id in enumerate(GetPhotoIDs_batch_iter(range(ctime_start,
+                                                                     ctime_start+ctime_length,
+                                                                     ctime_interval*ctime_interval),
+                                                               interval=ctime_interval)):
 
-                producer.send_messages('flickr-photo_id', photo_id)
+                producer.send_messages('flickr-photo_id-%d'%(1+(i%3)), photo_id)
+                #print photo_id
+                time.sleep(0.1)
 
             ctime_start += ctime_length
 
@@ -43,6 +45,9 @@ def main():
         t.start()
 
     time.sleep(5)
+
+    while False:
+        time.sleep(5)
 
 if __name__ == "__main__":
     logging.basicConfig(
