@@ -1,0 +1,735 @@
+{
+  "photo": {
+    "id": "16661925622",
+    "secret": "914e0ab062",
+    "server": "8657",
+    "farm": 9,
+    "camera": "Canon EOS 5D Mark II",
+    "exif": [
+      {
+        "tagspace": "JFIF",
+        "tagspaceid": 0,
+        "tag": "JFIFVersion",
+        "label": "JFIFVersion",
+        "raw": {
+          "_content": "1.01"
+        }
+      },
+      {
+        "tagspace": "JFIF",
+        "tagspaceid": 0,
+        "tag": "ResolutionUnit",
+        "label": "Resolution Unit",
+        "raw": {
+          "_content": "None"
+        }
+      },
+      {
+        "tagspace": "JFIF",
+        "tagspaceid": 0,
+        "tag": "XResolution",
+        "label": "X-Resolution",
+        "raw": {
+          "_content": "1"
+        }
+      },
+      {
+        "tagspace": "JFIF",
+        "tagspaceid": 0,
+        "tag": "YResolution",
+        "label": "Y-Resolution",
+        "raw": {
+          "_content": "1"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "Make",
+        "label": "Make",
+        "raw": {
+          "_content": "Canon"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "Model",
+        "label": "Model",
+        "raw": {
+          "_content": "Canon EOS 5D Mark II"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "Orientation",
+        "label": "Orientation",
+        "raw": {
+          "_content": "Horizontal (normal)"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "ResolutionUnit",
+        "label": "Resolution Unit",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "Software",
+        "label": "Software",
+        "raw": {
+          "_content": "Adobe Photoshop CS4 Windows"
+        }
+      },
+      {
+        "tagspace": "IFD0",
+        "tagspaceid": 0,
+        "tag": "ModifyDate",
+        "label": "Date and Time (Modified)",
+        "raw": {
+          "_content": "2010:12:24 12:56:43"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ExposureTime",
+        "label": "Exposure",
+        "raw": {
+          "_content": "1\/125"
+        },
+        "clean": {
+          "_content": "0.008 sec (1\/125)"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "FNumber",
+        "label": "Aperture",
+        "raw": {
+          "_content": "4.5"
+        },
+        "clean": {
+          "_content": "f\/4.5"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ExposureProgram",
+        "label": "Exposure Program",
+        "raw": {
+          "_content": "Manual"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ISO",
+        "label": "ISO Speed",
+        "raw": {
+          "_content": "400"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ExifVersion",
+        "label": "Exif Version",
+        "raw": {
+          "_content": "0221"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "DateTimeOriginal",
+        "label": "Date and Time (Original)",
+        "raw": {
+          "_content": "2010:11:30 16:08:37"
+        },
+        "clean": {
+          "_content": "2010:11:30 16:08:37.72+08:00"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "CreateDate",
+        "label": "Date and Time (Digitized)",
+        "raw": {
+          "_content": "2010:11:30 16:08:37"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ExposureCompensation",
+        "label": "Exposure Bias",
+        "raw": {
+          "_content": "0"
+        },
+        "clean": {
+          "_content": "0 EV"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "MaxApertureValue",
+        "label": "Max Aperture Value",
+        "raw": {
+          "_content": "2.8"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "MeteringMode",
+        "label": "Metering Mode",
+        "raw": {
+          "_content": "Multi-segment"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "Flash",
+        "label": "Flash",
+        "raw": {
+          "_content": "On, Fired"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "FocalLength",
+        "label": "Focal Length",
+        "raw": {
+          "_content": "25.0 mm"
+        },
+        "clean": {
+          "_content": "25 mm"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "SubSecTime",
+        "label": "Sub Sec Time",
+        "raw": {
+          "_content": "72"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "SubSecTimeOriginal",
+        "label": "Sub Sec Time Original",
+        "raw": {
+          "_content": "72"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "SubSecTimeDigitized",
+        "label": "Sub Sec Time Digitized",
+        "raw": {
+          "_content": "72"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ColorSpace",
+        "label": "Color Space",
+        "raw": {
+          "_content": "Uncalibrated"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "FocalPlaneXResolution",
+        "label": "Focal Plane X-Resolution",
+        "raw": {
+          "_content": "1908.156271"
+        },
+        "clean": {
+          "_content": "1908.15627141878 dpi"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "FocalPlaneYResolution",
+        "label": "Focal Plane Y-Resolution",
+        "raw": {
+          "_content": "1937.36952"
+        },
+        "clean": {
+          "_content": "1937.36951983299 dpi"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "FocalPlaneResolutionUnit",
+        "label": "Focal Plane Resolution Unit",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "CustomRendered",
+        "label": "Custom Rendered",
+        "raw": {
+          "_content": "Normal"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "ExposureMode",
+        "label": "Exposure Mode",
+        "raw": {
+          "_content": "Manual"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "WhiteBalance",
+        "label": "White Balance",
+        "raw": {
+          "_content": "Auto"
+        }
+      },
+      {
+        "tagspace": "ExifIFD",
+        "tagspaceid": 0,
+        "tag": "SceneCaptureType",
+        "label": "Scene Capture Type",
+        "raw": {
+          "_content": "Standard"
+        }
+      },
+      {
+        "tagspace": "IFD1",
+        "tagspaceid": 0,
+        "tag": "Compression",
+        "label": "Compression",
+        "raw": {
+          "_content": "JPEG (old-style)"
+        }
+      },
+      {
+        "tagspace": "IFD1",
+        "tagspaceid": 0,
+        "tag": "ResolutionUnit",
+        "label": "Resolution Unit",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "IFD1",
+        "tagspaceid": 0,
+        "tag": "ThumbnailOffset",
+        "label": "Thumbnail Offset",
+        "raw": {
+          "_content": "784"
+        }
+      },
+      {
+        "tagspace": "IFD1",
+        "tagspaceid": 0,
+        "tag": "ThumbnailLength",
+        "label": "Thumbnail Length",
+        "raw": {
+          "_content": "7738"
+        }
+      },
+      {
+        "tagspace": "XMP-x",
+        "tagspaceid": 0,
+        "tag": "XMPToolkit",
+        "label": "XMPToolkit",
+        "raw": {
+          "_content": "Adobe XMP Core 4.2.2-c063 53.352624, 2008\/07\/30-18:12:18        "
+        }
+      },
+      {
+        "tagspace": "XMP-tiff",
+        "tagspaceid": 0,
+        "tag": "Make",
+        "label": "Make",
+        "raw": {
+          "_content": "Canon"
+        }
+      },
+      {
+        "tagspace": "XMP-tiff",
+        "tagspaceid": 0,
+        "tag": "Model",
+        "label": "Model",
+        "raw": {
+          "_content": "Canon EOS 5D Mark II"
+        }
+      },
+      {
+        "tagspace": "XMP-tiff",
+        "tagspaceid": 0,
+        "tag": "ResolutionUnit",
+        "label": "Resolution Unit",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "XMP-tiff",
+        "tagspaceid": 0,
+        "tag": "Orientation",
+        "label": "Orientation",
+        "raw": {
+          "_content": "Horizontal (normal)"
+        }
+      },
+      {
+        "tagspace": "XMP-tiff",
+        "tagspaceid": 0,
+        "tag": "NativeDigest",
+        "label": "Native Digest",
+        "raw": {
+          "_content": "256,257,258,259,262,274,277,284,530,531,282,283,296,301,318,319,529,532,306,270,271,272,305,315,33432;620D357051EE9DA0A2A0741BF3C74498"
+        }
+      },
+      {
+        "tagspace": "XMP-xmp",
+        "tagspaceid": 0,
+        "tag": "Rating",
+        "label": "Rating",
+        "raw": {
+          "_content": "0"
+        }
+      },
+      {
+        "tagspace": "XMP-xmp",
+        "tagspaceid": 0,
+        "tag": "MetadataDate",
+        "label": "Metadata Date",
+        "raw": {
+          "_content": "2010:12:24 12:56:43+08:00"
+        }
+      },
+      {
+        "tagspace": "XMP-aux",
+        "tagspaceid": 0,
+        "tag": "Lens",
+        "label": "Lens",
+        "raw": {
+          "_content": "EF16-35mm f\/2.8L II USM"
+        }
+      },
+      {
+        "tagspace": "XMP-aux",
+        "tagspaceid": 0,
+        "tag": "ImageNumber",
+        "label": "Image Number",
+        "raw": {
+          "_content": "0"
+        }
+      },
+      {
+        "tagspace": "XMP-aux",
+        "tagspaceid": 0,
+        "tag": "FlashCompensation",
+        "label": "Flash Compensation",
+        "raw": {
+          "_content": "-0.333333333333333"
+        }
+      },
+      {
+        "tagspace": "XMP-aux",
+        "tagspaceid": 0,
+        "tag": "Firmware",
+        "label": "Firmware",
+        "raw": {
+          "_content": "1.1.0"
+        }
+      },
+      {
+        "tagspace": "XMP-dc",
+        "tagspaceid": 0,
+        "tag": "Format",
+        "label": "Format",
+        "raw": {
+          "_content": "image\/jpeg"
+        }
+      },
+      {
+        "tagspace": "XMP-photoshop",
+        "tagspaceid": 0,
+        "tag": "ColorMode",
+        "label": "Color Mode",
+        "raw": {
+          "_content": "RGB"
+        }
+      },
+      {
+        "tagspace": "XMP-photoshop",
+        "tagspaceid": 0,
+        "tag": "ICCProfileName",
+        "label": "ICCProfile Name",
+        "raw": {
+          "_content": "Adobe RGB (1998)"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "InstanceID",
+        "label": "Instance ID",
+        "raw": {
+          "_content": "xmp.iid:BD0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "DocumentID",
+        "label": "Document ID",
+        "raw": {
+          "_content": "xmp.did:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "OriginalDocumentID",
+        "label": "Original Document ID",
+        "raw": {
+          "_content": "xmp.did:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistoryAction",
+        "label": "History Action",
+        "raw": {
+          "_content": "saved"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistoryInstanceID",
+        "label": "History Instance ID",
+        "raw": {
+          "_content": "xmp.iid:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistoryWhen",
+        "label": "History When",
+        "raw": {
+          "_content": "2010:12:24 12:56:43+08:00"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistorySoftwareAgent",
+        "label": "History Software Agent",
+        "raw": {
+          "_content": "Adobe Photoshop CS4 Windows"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistoryChanged",
+        "label": "History Changed",
+        "raw": {
+          "_content": "\/"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "HistoryParameters",
+        "label": "History Parameters",
+        "raw": {
+          "_content": "from image\/tiff to image\/jpeg"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "DerivedFromInstanceID",
+        "label": "Derived From Instance ID",
+        "raw": {
+          "_content": "xmp.iid:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "DerivedFromDocumentID",
+        "label": "Derived From Document ID",
+        "raw": {
+          "_content": "xmp.did:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "XMP-xmpMM",
+        "tagspaceid": 0,
+        "tag": "DerivedFromOriginalDocumentID",
+        "label": "Derived From Original Document ID",
+        "raw": {
+          "_content": "xmp.did:BC0E312C1A0FE0119DC6D312683D1ABF"
+        }
+      },
+      {
+        "tagspace": "IPTC",
+        "tagspaceid": 0,
+        "tag": "ApplicationRecordVersion",
+        "label": "Application Record Version",
+        "raw": {
+          "_content": "84"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "IPTCDigest",
+        "label": "IPTCDigest",
+        "raw": {
+          "_content": "aafcde69b2e048c2a3434c6d948fa20d"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "DisplayedUnitsX",
+        "label": "Displayed Units X",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "DisplayedUnitsY",
+        "label": "Displayed Units Y",
+        "raw": {
+          "_content": "inches"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "GlobalAngle",
+        "label": "Global Angle",
+        "raw": {
+          "_content": "30"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "GlobalAltitude",
+        "label": "Global Altitude",
+        "raw": {
+          "_content": "30"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "PhotoshopThumbnail",
+        "label": "Photoshop Thumbnail",
+        "raw": {
+          "_content": "(Binary data 7738 bytes, use -b option to extract)"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "PhotoshopQuality",
+        "label": "Photoshop Quality",
+        "raw": {
+          "_content": "10"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "PhotoshopFormat",
+        "label": "Photoshop Format",
+        "raw": {
+          "_content": "Standard"
+        }
+      },
+      {
+        "tagspace": "Photoshop",
+        "tagspaceid": 0,
+        "tag": "ProgressiveScans",
+        "label": "Progressive Scans",
+        "raw": {
+          "_content": "3 Scans"
+        }
+      },
+      {
+        "tagspace": "Adobe",
+        "tagspaceid": 0,
+        "tag": "DCTEncodeVersion",
+        "label": "DCTEncode Version",
+        "raw": {
+          "_content": "100"
+        }
+      },
+      {
+        "tagspace": "Adobe",
+        "tagspaceid": 0,
+        "tag": "APP14Flags0",
+        "label": "APP14 Flags0",
+        "raw": {
+          "_content": "[14]"
+        }
+      },
+      {
+        "tagspace": "Adobe",
+        "tagspaceid": 0,
+        "tag": "APP14Flags1",
+        "label": "APP14 Flags1",
+        "raw": {
+          "_content": "(none)"
+        }
+      },
+      {
+        "tagspace": "Adobe",
+        "tagspaceid": 0,
+        "tag": "ColorTransform",
+        "label": "Color Transform",
+        "raw": {
+          "_content": "YCbCr"
+        }
+      }
+    ]
+  },
+  "stat": "ok"
+}
