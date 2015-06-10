@@ -1,4 +1,4 @@
-from time import mktime, strptime
+from time import mktime, strptime, strftime, gmtime
 from flickr_helper import GetPhotoIDs_iter, WriteFiles, GetSearchQueryAttrib
 import os
 import errno
@@ -32,12 +32,15 @@ def DownloadFlickrImagesAndMetaData(path='', **kwargs):
 
 if __name__ == '__main__':
 
-    timestamp = "11-11-2011_0000"
+    hour = "11-11-2011_0000"
 
-    min_taken_date = int(mktime(strptime(timestamp, "%d-%m-%Y_%H%M")))
+    starttime = int(mktime(strptime(hour, "%d-%m-%Y_%H%M")))
 
-    query = dict(min_taken_date=min_taken_date, max_taken_date=min_taken_date+60*60)
-    DownloadFlickrImagesAndMetaData(path=os.path.join('/tmp/InlivingColor/Flickr/11-11-2011'), **query)
+
+    for min_taken_date in range(starttime,starttime+3600):
+        timestamp = strftime("%d-%m-%Y_%H%M%S", gmtime(min_taken_date))
+        query = dict(min_taken_date=min_taken_date, max_taken_date=min_taken_date+60)
+        DownloadFlickrImagesAndMetaData(path=os.path.join('/tmp/InlivingColor/Flickr',timestamp), **query)
         # numberofminutes = 60
         # ctime_interval = 60
         # ctime_mod =

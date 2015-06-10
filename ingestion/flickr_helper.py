@@ -135,7 +135,7 @@ def mkdir_p(path):
             raise
 
 
-def WriteFiles(path='', photo_id=''):
+def WriteFiles(path='', photo_id=None):
 
     # path = os.path.join(path,)
 
@@ -154,9 +154,17 @@ def WriteFiles(path='', photo_id=''):
         f.write(ExifJSON)
 
 
+# def WriteFiles_AppendTimeStamp(path='', photo_id=None):
+
+
+
 def photo_id2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
     p = flickr.photos.getInfo(photo_id=photo_id)[0]
     return urlformat % p.attrib
+
+# def photo2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
+#     p = flickr.photos.getInfo(photo_id=photo_id)[0]
+#     return urlformat % p.attrib
 
 if __name__ == '__main__':
     # WriteFiles(photo_id='16661925622')
