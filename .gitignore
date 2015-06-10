@@ -1,5 +1,5 @@
 
 flickrapi_conf.py
+sftp-config.json
 *.pyc
 
-sftp-config.json

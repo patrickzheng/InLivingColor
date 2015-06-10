@@ -26,7 +26,8 @@ class Producer(threading.Thread):
                                                                      ctime_interval*ctime_interval),
                                                                interval=ctime_interval)):
 
-                producer.send_messages('flickr-photo_id-%d'%(1+(i%3)), photo_id)
+                # producer.send_messages('flickr-photo_id-%d'%(1+(i%3)), photo_id)
+                producer.send_messages(('flickr-photo_id'), photo_id)
                 #print photo_id
                 time.sleep(0.1)
 

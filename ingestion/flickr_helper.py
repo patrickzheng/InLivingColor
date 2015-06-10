@@ -1,6 +1,9 @@
 import time
 import flickrapi
 import wget
+import os
+import urllib
+import errno
 
 from flickrapi_conf import api_key, api_secret
 
@@ -50,19 +53,63 @@ def GetNumberOfPagesForSearchQuery(**kwargs):
     photos = flickr.photos.search(**kwargs)[0]
     return int(photos.attrib['pages'])
 
+def GetSearchQueryAttrib(**kwargs):
+    """
+    Users the Flickr API to...
+
+    {
+      "photos": {
+        "page": 1,
+        "pages": 79, <---------------------Number of Pages
+        "perpage": 100,
+        "total": "7861",
+        "photo": [
+          {
+            "id": "16717306373",
+            "owner": "130406501@N08",
+            "secret": "c074780d16",
+            "server": "8714",
+            "farm": 9,
+            "title": "DSC_8627",
+            "ispublic": 1,
+            "isfriend": 0,
+            "isfamily": 0
+          },
+
+          .....
+          {
+            "id": "16370206483",
+            "owner": "131105760@N07",
+            "secret": "db0a211487",
+            "server": "8693",
+            "farm": 9,
+            "title": "New Book by Fern Michaels Added",
+            "ispublic": 1,
+            "isfriend": 0,
+            "isfamily": 0
+          }
+        ]
+      },
+      "stat": "ok"
+    }
+    """
+    photos = flickr.photos.search(**kwargs)[0]
+    return photos.attrib
+
 def GetPhotoIDs_iter(**kwargs):
     numberofpages = GetNumberOfPagesForSearchQuery(**kwargs)
 
     for i in range(1,numberofpages+1):
     # for i in range(1,2):
-        photos = flickr.photos.search(**kwargs)[0]
+        photos = flickr.photos.search(page=i,**kwargs)[0]
 
         for p in photos:
             yield p.attrib['id']
 
+
 def GetPhotoIDs_batch_iter(ctime_values, interval=60):
     for ctime in ctime_values:
-        print ctime
+        # print ctime
         min_taken_date = ctime
         max_taken_date = ctime+interval
 
@@ -77,19 +124,31 @@ def GetMetaDataStrings(photo_id=None):
     ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
     return InfoJSON, ExifJSON
 
-def WriteFiles(directory='~/', photo_id=''):
-    # service_name='Flickr'
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 
-    wget.download(photo_id2url(photo_id))
+def WriteFiles(path='', photo_id=''):
+
+    mkdir_p(path)
+
+    # wget.download(photo_id2url(photo_id), out=os.path.join(path, 'Image.jpg'))
+    urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
 
     InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
     ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
 
-    with open('Info.json', 'w+') as f:
+    with open(os.path.join(path, 'Info.json'), 'w+') as f:
         f.write(InfoJSON)
 
-    with open('Exif.json', 'w+') as f:
+    with open(os.path.join(path, 'Exif.json'), 'w+') as f:
         f.write(ExifJSON)
 
 
