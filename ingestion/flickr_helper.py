@@ -137,6 +137,8 @@ def mkdir_p(path):
 
 def WriteFiles(path='', photo_id=''):
 
+    # path = os.path.join(path,)
+
     mkdir_p(path)
 
     # wget.download(photo_id2url(photo_id), out=os.path.join(path, 'Image.jpg'))

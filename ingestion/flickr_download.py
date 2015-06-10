@@ -35,11 +35,9 @@ if __name__ == '__main__':
     timestamp = "11-11-2011_0000"
 
     min_taken_date = int(mktime(strptime(timestamp, "%d-%m-%Y_%H%M")))
-    max_taken_date = min_taken_date+60*60
 
-    query = dict(min_taken_date=min_taken_date, max_taken_date=max_taken_date)
-
-    DownloadFlickrImagesAndMetaData(path=os.path.join('/tmp/InlivingColor/Flickr',timestamp), **query)
+    query = dict(min_taken_date=min_taken_date, max_taken_date=min_taken_date+60*60)
+    DownloadFlickrImagesAndMetaData(path=os.path.join('/tmp/InlivingColor/Flickr/11-11-2011'), **query)
         # numberofminutes = 60
         # ctime_interval = 60
         # ctime_mod =
