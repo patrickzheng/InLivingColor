@@ -10,6 +10,7 @@ from flickrapi_conf import api_key, api_secret
 flickr = flickrapi.FlickrAPI(api_key, api_secret)
 
 
+
 def GetNumberOfPagesForSearchQuery(**kwargs):
     """
     Users the Flickr API to...
@@ -141,7 +142,6 @@ def WriteFiles(path='', photo_id=None):
 
     mkdir_p(path)
 
-    # wget.download(photo_id2url(photo_id), out=os.path.join(path, 'Image.jpg'))
     urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
 
     InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
@@ -154,13 +154,152 @@ def WriteFiles(path='', photo_id=None):
         f.write(ExifJSON)
 
 
+import boto
+conn = boto.connect_s3()
+bucket = conn.get_bucket('insight-brian-inlivingcolor')
+# import urllib2
+
+import tempfile
+import shutil
+
+
+def WriteFilesToS3(path='', photo_id=None):
+
+    tempdir = tempfile.mkdtemp()
+    # print tempdir
+    WriteFiles(path=tempdir, photo_id=photo_id)
+
+    filenames = ['Info.json', 'Exif.json', 'Image.jpg']
+
+    for filename in filenames:
+
+        k = bucket.new_key(os.path.join(path, filename))
+        k.set_contents_from_filename(os.path.join(tempdir, filename))
+
+    shutil.rmtree(tempdir)
+    # import urllib2
+    # import contextlib
+
+    # search_query = photo_id2url(photo_id)
+
+    # with contextlib.closing(urllib.urlopen(search_query)) as x:
+    #    ...use x at will here...
+    # try:
+
+    #     sf = urllib2.urlopen(search_query)
+    #     search_soup = BeautifulSoup.BeautifulStoneSoup(sf.read())
+    # except urllib2.URLError, err:
+    #     print(err.reason)
+    # finally:
+    #     try:
+    #         sf.close()
+    #     except NameError:
+    #         pass
+
+    # path = os.path.join(path,)
+    # Create folder in S3
+    # print os.path.join(path)+'/'
+    # k = bucket.new_key(os.path.join(path)+'/')
+
+    # # mkdir_p(path)
+
+    # # wget.download(photo_id2url(photo_id), out=os.path.join(path, 'Image.jpg'))
+    # urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
+
+
+    # # Write getInfo information to S3
+    # resp_str = flickr.photos.getInfo(photo_id=photo_id, format="json")
+    # k = bucket.new_key(os.path.join(path, 'Info.json'))
+    # k.set_contents_from_string(resp_str)
+
+    # # Write getExif information to S3
+    # resp_str = flickr.photos.getExif(photo_id=photo_id, format="json")
+    # k = bucket.new_key(os.path.join(path, 'Info.json'))
+    # k.set_contents_from_string(resp_str)
+
+
+
+    # with open(os.path.join(path, 'Info.json'), 'w+') as f:
+    #     f.write(InfoJSON)
+
+    # with open(os.path.join(path, 'Exif.json'), 'w+') as f:
+    #     f.write(ExifJSON)
+
+
+
 # def WriteFiles_AppendTimeStamp(path='', photo_id=None):
 
 
+def photoid2getInfoResponse(photo_id):
+    """
+    Returns the response (in LXML format) from the method flickr.photos.getInfo
+    given a photo_id. In JSON format it looks like
+    {
+      "photo": {
+        "id": "16661925622",
+        "secret": "914e0ab062",
+        "server": "8657",
+        "farm": 9,
+        "dateuploaded": "1425048230",
+        "license": "0",
+        "safety_level": "0",
+        "rotation": 0,
+        "originalsecret": "3b5a302c95",
+        "originalformat": "jpg",
+        "owner": {
+          "nsid": "131496460@N02",
+          "username": "pannysong",
+          "realname": "panny song",
+          "location": "",
+          "iconserver": "0",
+          "iconfarm": 0,
+          "path_alias": null
+        },
+        "title": {
+          "_content": "IMG_9130"
+        },
+        "description": {
+          "_content": ""
+        },
+        "dates": {
+          "posted": "1425048230",
+          "taken": "2010-11-30 16:08:37",
+          "takengranularity": "0",
+          "takenunknown": "0",
+          "lastupdate": "1425446195"
+        },
+        "usage": {
+          "candownload": 1,
+          "canblog": 0,
+          "canprint": 0,
+          "canshare": 1
+        },
+        "tags": {
+          "tag": [
+          ]
+        },
+        "urls": {
+          "url": [
+            {
+              "type": "photopage",
+              "_content": "https:\/\/www.flickr.com\/photos\/131496460@N02\/16661925622\/"
+            }
+          ]
+        },
+      },
+    }
+    """
 
-def photo_id2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
     p = flickr.photos.getInfo(photo_id=photo_id)[0]
-    return urlformat % p.attrib
+    return p
+
+
+def photo_id2url(photo_id):
+    p = flickr.photos.getInfo(photo_id=photo_id)[0]
+    return photo2url(p)
+
+def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
+    return urlformat % photo.attrib
 
 # def photo2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
 #     p = flickr.photos.getInfo(photo_id=photo_id)[0]

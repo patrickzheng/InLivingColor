@@ -32,6 +32,7 @@ class ProducerPhotoID(threading.Thread):
 
         for photoid in TESTPHOTOIDS:
             producer.send_messages(('flickr-photoid'), photoid)
+            print "Sending PhotoID: %s"%photoid
 
             time.sleep(delay)
 
