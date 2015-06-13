@@ -4,7 +4,7 @@ import logging
 import time
 
 from kafka.client import KafkaClient
-from kafka.producer import SimpleProducer
+from kafka.producer import SimpleProducer, KeyedProducer
 
 TESTPHOTOIDS = [
                 '10784228453',
@@ -28,10 +28,12 @@ class ProducerPhotoID(threading.Thread):
 
     def run(self, delay=0.1):
         client = KafkaClient("localhost:9092")
-        producer = SimpleProducer(client)
+        producer = KeyedProducer(client)
+
+        import numpy as np
 
         for photoid in TESTPHOTOIDS:
-            producer.send_messages(('flickr-photoid'), photoid)
+            producer.send_messages('flickr-photoid','%d'%np.random.randint(0,20) ,photoid)
             print "Sending PhotoID: %s"%photoid
 
             time.sleep(delay)

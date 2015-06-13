@@ -15,23 +15,27 @@ class Producer(threading.Thread):
         client = KafkaClient("localhost:9092")
         producer = SimpleProducer(client)
 
-        while True:
-            ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
-            ctime_length = 60*60
-            ctime_interval = 60
-            ctime_mod = 1
+        ctime_start = int(time.mktime(time.strptime("30-12-2010 14:00", "%d-%m-%Y %H:%M")))
 
-            for i,photo_id in enumerate(GetPhotoIDs_batch_iter(range(ctime_start,
-                                                                     ctime_start+ctime_length,
-                                                                     ctime_interval*ctime_interval),
+        for i in range(1):
+            ctime_length = 60
+            ctime_interval = 60*60
+
+            print range(ctime_start,
+                        ctime_start+ctime_length,
+                        ctime_interval            )
+
+            ctime_starts = [ctime_start]
+
+            for i,photo_id in enumerate(GetPhotoIDs_batch_iter(ctime_starts,
                                                                interval=ctime_interval)):
 
-                # producer.send_messages('flickr-photo_id-%d'%(1+(i%3)), photo_id)
-                producer.send_messages(('flickr-photo_id'), photo_id)
+                print i, ctime_start, photo_id
+                producer.send_messages('flickr-photo_id-dist', photo_id)
                 #print photo_id
-                time.sleep(0.1)
+                time.sleep(0.3)
 
-            ctime_start += ctime_length
+            ctime_start += ctime_interval
 
             time.sleep(1)
 
@@ -47,12 +51,12 @@ def main():
 
     time.sleep(5)
 
-    while False:
+    while True:
         time.sleep(5)
 
 if __name__ == "__main__":
     logging.basicConfig(
         format='%(asctime)s.%(msecs)s:%(name)s:%(thread)d:%(levelname)s:%(process)d:%(message)s',
-        level=logging.DEBUG
+        level=logging.WARNING
         )
     main()

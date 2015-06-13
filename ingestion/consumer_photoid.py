@@ -12,7 +12,7 @@ from kafka.consumer import SimpleConsumer
 
 def normalize_timestamp(timestampstr):
     timestamp = time.strptime(timestampstr, "%Y-%m-%d %H:%M:%S")
-    timestamp_normalized = time.strftime("%Y-%m-%d_%H%M%S",timestamp)
+    timestamp_normalized = time.strftime("%Y-%m-%d",timestamp)
     return timestamp_normalized
 
 
