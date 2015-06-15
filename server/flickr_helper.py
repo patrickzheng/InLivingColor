@@ -5,65 +5,22 @@ import os
 import urllib
 import errno
 
-from flickrapi_conf import api_key, api_secret
+from _configuration import flickr_api_key, flickr_api_secret
 
-flickr = flickrapi.FlickrAPI(api_key, api_secret)
+flickr = flickrapi.FlickrAPI(flickr_api_key, flickr_api_secret)
 
 
-
-def GetNumberOfPagesForSearchQuery(**kwargs):
-    """
-    Users the Flickr API to...
-
-    {
-      "photos": {
-        "page": 1,
-        "pages": 79, <---------------------Number of Pages
-        "perpage": 100,
-        "total": "7861",
-        "photo": [
-          {
-            "id": "16717306373",
-            "owner": "130406501@N08",
-            "secret": "c074780d16",
-            "server": "8714",
-            "farm": 9,
-            "title": "DSC_8627",
-            "ispublic": 1,
-            "isfriend": 0,
-            "isfamily": 0
-          },
-
-          .....
-          {
-            "id": "16370206483",
-            "owner": "131105760@N07",
-            "secret": "db0a211487",
-            "server": "8693",
-            "farm": 9,
-            "title": "New Book by Fern Michaels Added",
-            "ispublic": 1,
-            "isfriend": 0,
-            "isfamily": 0
-          }
-        ]
-      },
-      "stat": "ok"
-    }
-    """
-    photos = flickr.photos.search(**kwargs)[0]
-    return int(photos.attrib['pages'])
 
 def GetSearchQueryAttrib(**kwargs):
     """
     Users the Flickr API to...
 
     {
-      "photos": {
-        "page": 1,
-        "pages": 79, <---------------------Number of Pages
-        "perpage": 100,
-        "total": "7861",
+      "photos": {        -+
+        "page": 1,        |
+        "pages": 79,      +---- Retrive this information
+        "perpage": 100,   |     as a Python dictionary
+        "total": "7861", -+
         "photo": [
           {
             "id": "16717306373",
@@ -97,15 +54,30 @@ def GetSearchQueryAttrib(**kwargs):
     photos = flickr.photos.search(**kwargs)[0]
     return photos.attrib
 
-def GetPhotoIDs_iter(**kwargs):
-    numberofpages = GetNumberOfPagesForSearchQuery(**kwargs)
 
-    for i in range(1,numberofpages+1):
-    # for i in range(1,2):
-        photos = flickr.photos.search(page=i,**kwargs)[0]
+def GetPhotoIDs_iter(page=None, **kwargs):
+    """
+    - page : If a page number is specified, then return that page. If
+             a page number is not specified, then return all pages.
+    """
 
+
+    # If a page number is specified, retreive results directly.
+    if page is not None:
+
+        photos = flickr.photos.search(page=page, **kwargs)[0]
         for p in photos:
             yield p.attrib['id']
+
+    # If a page number is not specified, then recursively obtain results
+    # by making a call to this generator for each page in the search.
+    else:
+        numberofpages = GetSearchQueryAttrib(**kwargs)['pages']
+
+        for page in range(1,numberofpages+1):
+            # print "Retreiving page %d"%page
+            for photoid in GetPhotoIDs_iter(page=page, **kwargs):
+                yield photoid
 
 
 def GetPhotoIDs_batch_iter(ctime_values, interval=60):

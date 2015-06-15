@@ -3,4 +3,4 @@ flickrapi_conf.py
 sftp-config.json
 *.pyc
 *.ipynb
-server/_configuration.py
+_configuration.py

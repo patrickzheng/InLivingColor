@@ -5,6 +5,7 @@ import time
 
 from kafka.client import KafkaClient
 from kafka.producer import SimpleProducer, KeyedProducer
+import json
 
 TESTPHOTOIDS = [
                 '10784228453',

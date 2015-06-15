@@ -13,7 +13,7 @@ class Consumer(threading.Thread):
 
     def run(self):
         client = KafkaClient("localhost:9092")
-        consumer = SimpleConsumer(client, "test-group", "my-topic")
+        consumer = SimpleConsumer(client, "theonlygroup", "testtopic3")
 
         for message in consumer:
             print(message)
