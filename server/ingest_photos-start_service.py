@@ -64,7 +64,7 @@ import os
 #     f = tar.extractfile(member)
 #     print(f)
 
-from subprocess import check_call
+from subprocess import call
 
 class Consumer(threading.Thread):
     daemon = True
@@ -76,34 +76,33 @@ class Consumer(threading.Thread):
         print consumer
 
         tempdir = tempfile.mkdtemp()
-        tempdirout = tempfile.mkdtemp()
+        # tempdirout = tempfile.mkdtemp()
 
         for kafkamessage in consumer:
-            print kafkamessage
+            # print "<- Msg:",
+            # print kafkamessage
 
-# ?            try:
-                # KafkaMessage(topic='testtopic3',partition=3,offset=10772,key='3',
-                #           value='{"photoid":"3486782878","collection":"leaves"}')
-                # print "<- Msg: %s" % [kafkamessage]
+            #    # try:
+            #     # KafkaMessage(topic='testtopic3',partition=3,offset=10772,key='3',
+            #     #           value='{"photoid":"3486782878","collection":"leaves"}')
+            #     # print "<- Msg: %s" % [kafkamessage]
 
             message = json.loads(kafkamessage[4])  # 4='value'
-            photoid = message['photoid']
-            tarfilepath = os.path.join(tempdirout, 'tarfile.tar')
-
-            WriteFiles(path=tempdir, photo_id=photoid)
-            check_call(['tar', '-cf %s %s' % (tarfilepath, tempdir)])
-
-            with open(tarfilepath) as f:
-                print "-> Msg: %s" % f
-                message_topic = 'test-tarfiles'
-                message_key = kafkamessage[3]  # 3='key'
-                message = f.read()
+            photo_id = message['photoid']
+            collection = message['collection']
 
 
-                #     print "-> Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
-                #                                                             message_key,
-                #                                                             message)
-                #     #     producer.send_messages(message_topic, message_key, message)
+            message_topic = 'test-tarfiles'
+            message_key = kafkamessage[3]  # 3='key'
+            message = WriteFilesToTar(photo_id=photo_id)
+
+            # break
+
+
+            # print "-> Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
+            #                                                         message_key,
+            #                                                         message)
+                    #     producer.send_messages(message_topic, message_key, message)
             # except:
             #     pass
 

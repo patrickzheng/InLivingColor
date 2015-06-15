@@ -4,6 +4,11 @@ import wget
 import os
 import urllib
 import errno
+import tempfile
+import shutil
+import tarfile
+import subprocess
+
 
 from _configuration import flickr_api_key, flickr_api_secret
 
@@ -112,19 +117,40 @@ def WriteFiles(path='', photo_id=None):
 
     # path = os.path.join(path,)
 
-    mkdir_p(path)
+    mkdir_p(os.path.join(path, photo_id))
 
-    urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
+    urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, photo_id, 'Image.jpg'))
 
     InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
     ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
 
-    with open(os.path.join(path, 'Info.json'), 'w+') as f:
+    with open(os.path.join(path, photo_id, 'Info.json'), 'w+') as f:
         f.write(InfoJSON)
 
-    with open(os.path.join(path, 'Exif.json'), 'w+') as f:
+    with open(os.path.join(path, photo_id, 'Exif.json'), 'w+') as f:
         f.write(ExifJSON)
 
+
+def WriteFilesToTar(photo_id=None):
+
+    tempdir = tempfile.mkdtemp()
+    print tempdir
+
+    WriteFiles(path=tempdir, photo_id=photo_id)
+
+    with tempfile.NamedTemporaryFile(delete=True) as f:
+        # print f.name
+
+        command = ['tar', '-cf', f.name, tempdir]
+        print command
+
+        subprocess.call(command)
+
+        output = f.read()
+
+    shutil.rmtree(tempdir)
+
+    return output
 
 
 def WriteFilesToS3(path='', photo_id=None):
@@ -133,9 +159,6 @@ def WriteFilesToS3(path='', photo_id=None):
     conn = boto.connect_s3()
     bucket = conn.get_bucket('insight-brian-inlivingcolor')
     # import urllib2
-
-    import tempfile
-    import shutil
 
     tempdir = tempfile.mkdtemp()
     # print tempdir
@@ -279,14 +302,19 @@ def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s
 
 if __name__ == '__main__':
     # WriteFiles(photo_id='16661925622')
-    ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
-    ctime_length = 60
-    ctime_interval = 60
-    ctime_mod = 1
-    for photo_id in GetPhotoIDs_batch_iter(range(ctime_start,
-                                                 ctime_start+ctime_length,
-                                                 ctime_interval*ctime_interval),
-                                           interval=ctime_interval):
-        print '.',
+    # ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
+    # ctime_length = 60
+    # ctime_interval = 60
+    # ctime_mod = 1
+    # for photo_id in GetPhotoIDs_batch_iter(range(ctime_start,
+    #                                              ctime_start+ctime_length,
+    #                                              ctime_interval*ctime_interval),
+    #                                        interval=ctime_interval):
+    #     print '.',
 
+
+    string =  WriteFilesToTar(photo_id='2869316960')
+
+    with open("/tmp/test.tar",'w+b') as f:
+        f.write(string)
 
