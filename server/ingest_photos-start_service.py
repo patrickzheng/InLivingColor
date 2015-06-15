@@ -8,7 +8,7 @@ from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
 from kafka.consumer import KafkaConsumer
 
-from flickr_helper import WriteFiles
+from flickr_helper import WriteFiles, WriteFilesToTar, GetPhotoAndMetaData
 
 
 import json
@@ -43,6 +43,7 @@ import json
 import tempfile
 import shutil
 import os
+import subprocess
 
 #     # print tempdir
 #     WriteFiles(path=tempdir, photo_id=photo_id)
@@ -66,51 +67,134 @@ import os
 
 from subprocess import call
 
-class Consumer(threading.Thread):
+from cassandra.cluster import Cluster
+
+class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
     daemon = True
 
     def run(self):
-        consumer = KafkaConsumer("test-downloadbyphotoid", group_id="theonlygroup", metadata_broker_list=KAFKA_BROKER_LIST.split(',')[:])
+        cluster = Cluster()
+        session = cluster.connect('inlivingcolor')
+
+
+        consumer = KafkaConsumer("test-downloadbyphotoid",
+                                 group_id="theonlygroup",
+                                 metadata_broker_list=KAFKA_BROKER_LIST.split(',')[:],
+                                 auto_commit_enable=True,
+                                 auto_commit_interval_messages=50,
+                                 auto_commit_interval_ms=10*1000,
+                                 )
         # producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
-        print consumer
+        # print consumer
 
         tempdir = tempfile.mkdtemp()
-        # tempdirout = tempfile.mkdtemp()
 
         for kafkamessage in consumer:
-            # print "<- Msg:",
-            # print kafkamessage
 
-            #    # try:
-            #     # KafkaMessage(topic='testtopic3',partition=3,offset=10772,key='3',
-            #     #           value='{"photoid":"3486782878","collection":"leaves"}')
-            #     # print "<- Msg: %s" % [kafkamessage]
+            print kafkamessage
+            # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
+            try:
+                collection = json.loads(kafkamessage[3])['collection']  # 4='value'
+                photo_id = kafkamessage[4]  # 4='value'
 
-            message = json.loads(kafkamessage[4])  # 4='value'
-            photo_id = message['photoid']
-            collection = message['collection']
+                # print photo_id
+                # raise
 
+                rsp = GetPhotoAndMetaData(photo_id)
+                print collection, photo_id, rsp['ImageJPG'][:10]
 
-            message_topic = 'test-tarfiles'
-            message_key = kafkamessage[3]  # 3='key'
-            message = WriteFilesToTar(photo_id=photo_id)
+                # forcassandra = dict(
+                #         collection=collection,
+                #         photoid=photo_id,
+                #         ImageJPG=rsp['ImageJPG'],
+                #         InfoJSON=rsp['InfoJSON'],
+                #         ExifJSON=rsp['ExifJSON'],
+                #         )
 
-            # break
+                # print forcassandra
 
+                # Insert one record into the users table
+                prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
+                bound_stmt = prepared_stmt.bind([collection,
+                                                photo_id,
+                                                rsp['ImageJPG'],
+                                                rsp['InfoJSON'],
+                                                rsp['ExifJSON']])
 
-            # print "-> Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
-            #                                                         message_key,
-            #                                                         message)
-                    #     producer.send_messages(message_topic, message_key, message)
-            # except:
-            #     pass
+                stmt = session.execute(bound_stmt)
+
+                print "Sent to cassandra photoid, ", photoid
+
+            except:
+                pass
 
         shutil.rmtree(tempdir)
 
 
+# CREATE TABLE FlickrSOT ( collection text, photoid text, ImageJPG blob, InfoJSON text, ExifJSON text, PRIMARY KEY (collection,  photoid));# class ConsumeTarFileStringsAndUpload(threading.Thread):
+#     daemon = True
+
+#     def run(self):
+
+#         consumer = KafkaConsumer("test-tarfiles", group_id="theonlygroup", metadata_broker_list=KAFKA_BROKER_LIST.split(',')[:])
+
+#         tempdir = tempfile.mkdtemp()
+
+#         print 'tempdir', tempdir
+
+#         messagesinbuffer = 0
+#         ctimeforlastmessage = {}
+
+#         for kafkamessage in consumer:
+#             print '<- (test-tarfiles)',
+#             print  kafkamessage[3]
+
+#             collection = json.loads(kafkamessage[3])['collection']
+
+#             tarfilestring = kafkamessage[4]
+
+#             with tempfile.NamedTemporaryFile() as f:
+#                 f.write(tarfilestring)
+
+#                 # subprocess.call(['tar', 'xf', f.name, '-C', tempdir])
+
+
+#             try:
+#                 timesincelastmessage = time.clock() - ctimeforlastmessage[collection]
+#             except:
+#                 timesincelastmessage = 0.0
+
+
+#             messagesinbuffer += 1
+
+#             if messagesinbuffer >= 10 or timesincelastmessage > 5.0:
+#                 print "EMPTY BUFFER"
+#                 # subprocess.call(['tar', 'xf', f.name, '-C', tempdir])
+
+#                 messagesinbuffer = 0
+
+
+
+#             ctimeforlastmessage[collection] = time.clock()
+#             # subprocess.call(['ls', tempdir])
+
+
+#             # try:
+#             #     tarfilestring = kafkamessage[4]  # 4='value'
+
+#             #     message_topic = 'test-tarfiles'
+#             #     message_key = kafkamessage[3]  # 3='key'
+
+#             #     producer.send_messages(message_topic, message_key, message)
+#             # except:
+#             #     pass
+
+#         # shutil.rmtree(tempdir)
+
 if __name__ == "__main__":
-    Consumer().start()
+    ConsumePhotoIDandStoreDataInSourceOfTruth().start()
+    # ConsumeTarFileStringsAndUpload().start()
 
     while True:
         time.sleep(5)

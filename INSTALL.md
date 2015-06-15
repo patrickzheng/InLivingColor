@@ -41,6 +41,21 @@ group.id=theonlygroup
 
 
 
+
+# Install pyspark cassandra https://github.com/Parsely/pyspark-cassandra
+# Install cassandra-driver
+
+http://planetcassandra.org/getting-started-with-cassandra-and-python/
+
+
+
+
+
+
+
+
+
+
 Install with your favorite package manager
 
 Latest Release

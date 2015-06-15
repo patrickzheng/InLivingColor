@@ -84,6 +84,30 @@ def GetPhotoIDs_iter(page=None, **kwargs):
             for photoid in GetPhotoIDs_iter(page=page, **kwargs):
                 yield photoid
 
+def GetPhotos_iter(page=None, **kwargs):
+    """
+    - page : If a page number is specified, then return that page. If
+             a page number is not specified, then return all pages.
+    """
+
+
+    # If a page number is specified, retreive results directly.
+    if page is not None:
+
+        photos = flickr.photos.search(page=page, **kwargs)[0]
+        for p in photos:
+            yield p
+
+    # If a page number is not specified, then recursively obtain results
+    # by making a call to this generator for each page in the search.
+    else:
+        numberofpages = GetSearchQueryAttrib(**kwargs)['pages']
+
+        for page in range(1,numberofpages+1):
+            # print "Retreiving page %d"%page
+            for p in GetPhotos_iter(page=page, **kwargs):
+                yield p
+
 
 def GetPhotoIDs_batch_iter(ctime_values, interval=60):
     for ctime in ctime_values:
@@ -112,6 +136,21 @@ def mkdir_p(path):
         else:
             raise
 
+def GetPhotoAndMetaData(photo_id):
+    # photo_id = photo.attrib['id']
+
+    with tempfile.NamedTemporaryFile(delete=True) as f:
+        urllib.urlretrieve(photo_id2url(photo_id), f.name)
+
+        ImageJPG = f.read()
+
+
+    InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
+    ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
+
+    return dict(ImageJPG=ImageJPG, InfoJSON=InfoJSON, ExifJSON=ExifJSON)
+
+
 
 def WriteFiles(path='', photo_id=None):
 
@@ -134,15 +173,15 @@ def WriteFiles(path='', photo_id=None):
 def WriteFilesToTar(photo_id=None):
 
     tempdir = tempfile.mkdtemp()
-    print tempdir
+    # print tempdir
 
     WriteFiles(path=tempdir, photo_id=photo_id)
 
     with tempfile.NamedTemporaryFile(delete=True) as f:
         # print f.name
 
-        command = ['tar', '-cf', f.name, tempdir]
-        print command
+        command = ['tar', '-cf', f.name, '-C', tempdir, '.']
+        # print command
 
         subprocess.call(command)
 
@@ -313,8 +352,11 @@ if __name__ == '__main__':
     #     print '.',
 
 
-    string =  WriteFilesToTar(photo_id='2869316960')
+    # string =  WriteFilesToTar(photo_id='2869316960')
 
-    with open("/tmp/test.tar",'w+b') as f:
-        f.write(string)
+    # with open("/tmp/test.tar",'w+b') as f:
+    #     f.write(string)
+
+    output = GetPhotoAndMetaData(photo_id='2869316960')
+    print output['ImageJPG']
 
