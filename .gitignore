@@ -2,12 +2,5 @@
 flickrapi_conf.py
 sftp-config.json
 *.pyc
-
-
 *.ipynb
-
-*.pyc
-
-*.pyc
-
 server/_configuration.py
