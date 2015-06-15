@@ -154,16 +154,16 @@ def WriteFiles(path='', photo_id=None):
         f.write(ExifJSON)
 
 
-import boto
-conn = boto.connect_s3()
-bucket = conn.get_bucket('insight-brian-inlivingcolor')
-# import urllib2
-
-import tempfile
-import shutil
-
 
 def WriteFilesToS3(path='', photo_id=None):
+
+    import boto
+    conn = boto.connect_s3()
+    bucket = conn.get_bucket('insight-brian-inlivingcolor')
+    # import urllib2
+
+    import tempfile
+    import shutil
 
     tempdir = tempfile.mkdtemp()
     # print tempdir
