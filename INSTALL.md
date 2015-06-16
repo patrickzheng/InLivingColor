@@ -55,6 +55,8 @@ http://planetcassandra.org/getting-started-with-cassandra-and-python/
 # get rid of warnings@
 sudo pip install pyopenssl ndg-httpsclient pyasn1
 
+sudo pip install blist
+
 
 
 
