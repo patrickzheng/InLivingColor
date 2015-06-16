@@ -18,7 +18,7 @@ import json
 import time
 
 def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
-
+    return
     photoidlistlist = []
     print photoidlistlist
     return
@@ -35,7 +35,7 @@ def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
     print photoids
 
 def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
-                                         skip_if_downloaded=False, check_api_limit=True, limit_at_n=4000):
+                                         skip_if_downloaded=False, check_api_limit=False, limit_at_n=4000, delay=0.1):
     """
     Queues the results of a FlickrAPI search query for downloading into an
     InLivingColor collection by sending message via Kafka to the cluster (i.e.,
@@ -99,11 +99,11 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
         wholelistofphotoids += photoids
 
 
-        # for photoid in [photoids[0],photoids[-1]]:
-        #     # print photoid
-        #     # print json.loads(photoid2getInfoResponse(photoid))
-        #     dateposted = float(json.loads(GetInfoAsJson(photoid))['photo']['dates']['posted'])
-        #     print photoid, time.ctime(dateposted)
+        for photoid in [photoids[0],photoids[-1]]:
+            # print photoid
+            # print json.loads(photoid2getInfoResponse(photoid))
+            dateposted = float(json.loads(GetInfoAsJson(photoid))['photo']['dates']['posted'])
+            print photoid, time.ctime(dateposted)
 
         print "Downloading page %s/%s" % (page, rsp['pages']),
         print "%s ... %s" % (photoids[0],photoids[-1])
@@ -111,15 +111,17 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
         # Send
     if dry_run is False:
         QueueIngestionByPhotoIDs(collection,
+                                 # wholelistofphotoids,
                                  photoids,
                                  # key=json.dumps(dict(collection=collection,
                                  #                page=page)),
-                                 skip_if_downloaded=skip_if_downloaded)
+                                 skip_if_downloaded=skip_if_downloaded,
+                                 delay=delay)
 
     return wholelistofphotoids
 
 def QueueIngestionByPhotoIDs(collection, photoids, key=None,
-                             skip_if_downloaded=False):
+                             skip_if_downloaded=False, delay=0.1):
     """
     Queues the given Flickr photoid's for downloading into an InLivingColor
     collection by sending message via Kafka to the cluster (i.e., this is
@@ -157,12 +159,13 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         print "Sending Kafka Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
                                                                 message_key,
                                                                 message)
+        time.sleep(delay)
         producer.send_messages(message_topic, message_key, message)
 
 
 if __name__ == '__main__':
     import time
-    # query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
-    # QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
-    query = dict(min_upload_date=int(time.clock()), order='date-taken-asc')
-    QueueIngestionByFlickrAPISearchQuery('allrecent', query, dry_run=False)
+    query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
+    QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
+    # query = dict(min_upload_date=int(time.clock()), order='date-taken-asc')
+    # QueueIngestionByFlickrAPISearchQuery('allrecent', query, dry_run=False)
