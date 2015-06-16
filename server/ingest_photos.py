@@ -57,7 +57,7 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
     for page in range(1,numberofpages+1):
 
         # Put photoids from this page into a list
-        photoids = list(GetPhotoIDs_iter(page=page, **query))
+        photoids = list(GetPhotoIDs_iter(page=str(page), **query))
 
         print "Downloading page %s/%s" % (page, rsp['pages']),
         print "%s ... %s" % (photoids[0],photoids[-1])

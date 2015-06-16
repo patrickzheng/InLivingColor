@@ -51,6 +51,14 @@ from random import shuffle
 class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
     daemon = True
 
+    def __init__(self, dry_run=False):
+        """
+        - dry_run (bool) : If True, will not download and will not write to cassandra.
+        """
+
+        self.dry_run = dry_run
+
+
     def run(self):
         # cluster = Cluster()
         # session = cluster.connect('inlivingcolor')
@@ -94,18 +102,19 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
                 # print photoid
                 # raise
+                if dry_run is False:
+                    rsp = GetPhotoAndMetaData(photoid)
+                    # print collection, photoid, rsp['ImageJPG'][:10]
 
-                rsp = GetPhotoAndMetaData(photoid)
-                # print collection, photoid, rsp['ImageJPG'][:10]
+                    forcassandra = dict(
+                            collection=collection,
+                            photoid=photoid,
+                            imagejpg=rsp['ImageJPG'],
+                            infojson=rsp['InfoJSON'],
+                            exifjson=rsp['ExifJSON'],
+                            )
+                    flickrsot.create(**forcassandra)
 
-                forcassandra = dict(
-                        collection=collection,
-                        photoid=photoid,
-                        imagejpg=rsp['ImageJPG'],
-                        infojson=rsp['InfoJSON'],
-                        exifjson=rsp['ExifJSON'],
-                        )
-                flickrsot.create(**forcassandra)
                 print "Sent to Cassandra %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
 
                 ### TODO: print partition
@@ -205,7 +214,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 #         # shutil.rmtree(tempdir)
 
 if __name__ == "__main__":
-    ConsumePhotoIDandStoreDataInSourceOfTruth().start()
+    ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=True).start()
     # ConsumeTarFileStringsAndUpload().start()
 
     while True:
