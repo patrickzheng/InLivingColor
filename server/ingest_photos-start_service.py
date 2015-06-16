@@ -85,7 +85,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
                 if flickrsot.objects(collection=collection,
                                      photoid=photoid).count() > 0:
-                    print "Already downloaded %s/%s" % (collection, photoid)
+                    print "Already downloaded %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
                     continue
 
 
