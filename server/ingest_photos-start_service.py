@@ -128,6 +128,8 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
                 collection = json.loads(kafkamessage[3])['collection']  # 4='value'
                 photo_id = kafkamessage[4]  # 4='value'
 
+                print "hi"
+
                 if flickrsot.objects(collection=collection,
                                      photoid=photo_id).count() > 0:
                     print "Already downloaded %s/%s" % (collection,photoid)
