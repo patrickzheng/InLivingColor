@@ -1,3 +1,8 @@
+DON'T run
+
+Replaced vy
+kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
+
 #!/usr/bin/env python
 import threading
 import time
@@ -63,7 +68,6 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
                              auto_commit_interval_ms=10*1000,
 
                              )
-    # producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
     print consumer
 
@@ -76,36 +80,8 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
     for kafkamessage in consumer:
 
         # print kafkamessage
-        # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
         try:
-            collection = json.loads(kafkamessage[4])['collection']  # 4='value'
-            photoid = json.loads(kafkamessage[4])['photoid']  # 4='value'
-
-            # print "hi",
-            # raise
-
-            if flickrsot.objects(collection=collection,
-                                 photoid=photoid).count() > 0:
-                print "Already downloaded %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
-                continue
-
-
-            # print photoid
-            # raise
-            if dry_run is False:
-                rsp = GetPhotoAndMetaData(photoid)
-                # print collection, photoid, rsp['ImageJPG'][:10]
-
-                forcassandra = dict(
-                        collection=collection,
-                        photoid=photoid,
-                        imagejpg=rsp['ImageJPG'],
-                        infojson=rsp['InfoJSON'],
-                        exifjson=rsp['ExifJSON'],
-                        )
-                flickrsot.create(**forcassandra)
-
-            print "Sent to Cassandra %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
+            # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
 
             ### TODO: print partition
             # print forcassandra

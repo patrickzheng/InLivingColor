@@ -14,6 +14,8 @@ from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter, GetInfoAsJson
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
 
+KAFKA_BROKER_LIST = 'ip-172-31-6-188:9092'
+
 producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
 print producer
@@ -23,21 +25,20 @@ import json
 import time
 
 def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
-    return
-    photoidlistlist = []
-    print photoidlistlist
-    return
 
-    # while True:
+    while True:
 
-    query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime)),
-                 max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime+5*60)),
-                 per_page='100',
-                sort='date-posted-asc',
-                )
-    photoids = list(GetPhotoIDs_iter(max_number_of_pages=4, **query))
-    photoids = photoids[:min(4000,photoids)]
-    print photoids
+        print startctime
+
+
+        query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime)),
+                     max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime+10*60)),
+                    sort='date-posted-asc',
+                    )
+        QueueIngestionByFlickrAPISearchQuery(collection=collection,query=query,dry_run=dry_run, limit_at_n=4000)
+
+        startctime += 10*60
+        # print photoids
 
 def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
                                          skip_if_downloaded=False, check_api_limit=False, limit_at_n=4000, delay=0.1):
@@ -114,14 +115,14 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
         print "%s ... %s" % (photoids[0],photoids[-1])
 
         # Send
-    if dry_run is False:
-        QueueIngestionByPhotoIDs(collection,
-                                 # wholelistofphotoids,
-                                 photoids,
-                                 # key=json.dumps(dict(collection=collection,
-                                 #                page=page)),
-                                 skip_if_downloaded=skip_if_downloaded,
-                                 delay=delay)
+        if dry_run is False:
+            QueueIngestionByPhotoIDs(collection,
+                                     # wholelistofphotoids,
+                                     photoids,
+                                     # key=json.dumps(dict(collection=collection,
+                                     #                page=page)),
+                                     skip_if_downloaded=skip_if_downloaded,
+                                     delay=delay)
 
     return wholelistofphotoids
 
@@ -159,7 +160,7 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         message = json.dumps(dict(collection=collection, photoid=str(photoid)))
         # '{"photoid": "3311097747", "collection": "leaves"}'
 
-        print "Sending Kafka Msg (topic=%s, key=%s, msg=%s)" % (KAFKA_PHOTOID_TOPIC,
+        print "-> Kafka(topic=%s, key=%s, msg=%s)" % (KAFKA_PHOTOID_TOPIC,
                                                                 message_key,
                                                                 message)
         time.sleep(delay)
@@ -168,7 +169,9 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
 
 if __name__ == '__main__':
     import time
-    query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
-    QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
+    # query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
+    # QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
     # query = dict(min_upload_date=int(time.clock()), order='date-taken-asc')
     # QueueIngestionByFlickrAPISearchQuery('allrecent', query, dry_run=False)
+
+    SmartQueueIngestionByDateUploaded(collection='allrecent', startctime=int(time.time())-24*3600, dry_run=False)
