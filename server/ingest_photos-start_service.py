@@ -103,7 +103,9 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
                         exifjson=rsp['ExifJSON'],
                         )
                 flickrsot.create(**forcassandra)
-                print "Sent to Cassandra %s/%s" % (collection, photoid)
+                print "Sent to Cassandra %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
+
+                ### TODO: print partition
                 # print forcassandra
 
                 # Insert one record into the users table
