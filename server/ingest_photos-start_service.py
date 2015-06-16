@@ -77,64 +77,64 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
             # print kafkamessage
             # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
-            # try:
-            collection = json.loads(kafkamessage[3])['collection']  # 4='value'
-            photoid = kafkamessage[4]  # 4='value'
+            try:
+                collection = json.loads(kafkamessage[3])['collection']  # 4='value'
+                photoid = kafkamessage[4]  # 4='value'
 
-            print "hi"
+                # print "hi"
 
-            if flickrsot.objects(collection=collection,
-                                 photoid=photoid).count() > 0:
-                print "Already downloaded %s/%s" % (collection, photoid)
-                continue
-
-
-            # print photoid
-            # raise
-
-            rsp = GetPhotoAndMetaData(photoid)
-            # print collection, photoid, rsp['ImageJPG'][:10]
-
-            forcassandra = dict(
-                    collection=collection,
-                    photoid=photoid,
-                    ImageJPG=rsp['ImageJPG'],
-                    InfoJSON=rsp['InfoJSON'],
-                    ExifJSON=rsp['ExifJSON'],
-                    )
-            flickrsot.create(**forcassandra)
-            print "Send to Cassandra %s/%s" % (collection, photoid)
-            # print forcassandra
-
-            # Insert one record into the users table
-
-            ################################################################
-            # TO HBASE
-            # table.put('row-key', {'collection:': collection,
-            #                       'photoid:': photoid,
-            #                       'ImageJPG:': rsp['ImageJPG'],
-            #                       'InfoJSON:': rsp['InfoJSON'],
-            #                       'ExifJSON:': rsp['ExifJSON']})
+                if flickrsot.objects(collection=collection,
+                                     photoid=photoid).count() > 0:
+                    print "Already downloaded %s/%s" % (collection, photoid)
+                    continue
 
 
-            # print "Sent to HBase photoid, ", photoid
+                # print photoid
+                # raise
 
-            ################################################################
-            # TO CASSANDRA
+                rsp = GetPhotoAndMetaData(photoid)
+                # print collection, photoid, rsp['ImageJPG'][:10]
 
-            # prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
-            # bound_stmt = prepared_stmt.bind([collection,
-            #                                 photoid,
-            #                                 rsp['ImageJPG'],
-            #                                 rsp['InfoJSON'],
-            #                                 rsp['ExifJSON']])
+                forcassandra = dict(
+                        collection=collection,
+                        photoid=photoid,
+                        ImageJPG=rsp['ImageJPG'],
+                        InfoJSON=rsp['InfoJSON'],
+                        ExifJSON=rsp['ExifJSON'],
+                        )
+                flickrsot.create(**forcassandra)
+                print "Sent to Cassandra %s/%s" % (collection, photoid)
+                # print forcassandra
 
-            # stmt = session.execute(bound_stmt)
+                # Insert one record into the users table
 
-            # print "Sent to cassandra photoid, ", photoid
+                ################################################################
+                # TO HBASE
+                # table.put('row-key', {'collection:': collection,
+                #                       'photoid:': photoid,
+                #                       'ImageJPG:': rsp['ImageJPG'],
+                #                       'InfoJSON:': rsp['InfoJSON'],
+                #                       'ExifJSON:': rsp['ExifJSON']})
 
-            # except:
-            #     pass
+
+                # print "Sent to HBase photoid, ", photoid
+
+                ################################################################
+                # TO CASSANDRA
+
+                # prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
+                # bound_stmt = prepared_stmt.bind([collection,
+                #                                 photoid,
+                #                                 rsp['ImageJPG'],
+                #                                 rsp['InfoJSON'],
+                #                                 rsp['ExifJSON']])
+
+                # stmt = session.execute(bound_stmt)
+
+                # print "Sent to cassandra photoid, ", photoid
+
+            except:
+                pass
 
         shutil.rmtree(tempdir)
 
