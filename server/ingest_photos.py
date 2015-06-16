@@ -115,7 +115,7 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
 
 if __name__ == '__main__':
     import time
-    query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
-    QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
-    # query = dict(min_upload_date=int(time.clock()), order='date-taken-asc')
-    # QueueIngestionByFlickrAPISearchQuery('allrecent', query, dry_run=True)
+    # query = dict(text='leaves', content_type=1, has_geo=1, is_commons=1, order='date-taken-asc')
+    # QueueIngestionByFlickrAPISearchQuery('leaves', query, dry_run=False)
+    query = dict(min_upload_date=int(time.clock()), order='date-taken-asc')
+    QueueIngestionByFlickrAPISearchQuery('allrecent', query, dry_run=False)
