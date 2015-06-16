@@ -56,7 +56,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
         # session = cluster.connect('inlivingcolor')
 
 
-        consumer = KafkaConsumer("test-downloadbyphotoid",
+        consumer = KafkaConsumer("downloadbyphotoid",
                                  group_id="theonlygroup",
                                  metadata_broker_list=KAFKA_BROKER_LIST.split(',')[:],
                                  auto_commit_enable=True,

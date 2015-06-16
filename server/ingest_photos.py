@@ -102,7 +102,7 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         assert type(photoid) is str
         #######################################################################
         # Send the message via Kafka
-        message_topic = 'test-downloadbyphotoid'
+        message_topic = 'downloadbyphotoid'
         message_key = key if key is not None else photoid
         message = str(photoid)
         # '{"photoid": "3311097747", "collection": "leaves"}'
