@@ -15,57 +15,10 @@ import json
 import happybase
 
 
-
-# def WriteFiles(path='', photo_id=None):
-
-#     # path = os.path.join(path,)
-
-#     mkdir_p(path)
-
-#     urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
-
-#     InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
-#     ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
-
-#     with open(os.path.join(path, 'Info.json'), 'w+') as f:
-#         f.write(InfoJSON)
-
-#     with open(os.path.join(path, 'Exif.json'), 'w+') as f:
-#         f.write(ExifJSON)
-
-
-
-# def WriteFilesToS3(path='', photo_id=None):
-
-#     import boto
-#     conn = boto.connect_s3()
-#     bucket = conn.get_bucket('insight-brian-inlivingcolor')
-#     # import urllib2
-
 import tempfile
 import shutil
 import os
 import subprocess
-
-#     # print tempdir
-#     WriteFiles(path=tempdir, photo_id=photo_id)
-
-#     filenames = ['Info.json', 'Exif.json', 'Image.jpg']
-
-#     for filename in filenames:
-
-#         k = bucket.new_key(os.path.join(path, filename))
-#         k.set_contents_from_filename(os.path.join(tempdir, filename))
-
-# import tarfile
-# import io
-# byte_array = client.read_bytes()
-# file_like_object = io.BytesIO(byte_array)
-# tar = tarfile.open(fileobj=file_like_object)
-# # use "tar" as a regular TarFile object
-# for member in tar.getmembers():
-#     f = tar.extractfile(member)
-#     print(f)
 
 from subprocess import call
 from cassandra.cluster import Cluster
@@ -126,31 +79,31 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
             # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
             # try:
             collection = json.loads(kafkamessage[3])['collection']  # 4='value'
-            photo_id = kafkamessage[4]  # 4='value'
+            photoid = kafkamessage[4]  # 4='value'
 
             print "hi"
 
             if flickrsot.objects(collection=collection,
-                                 photoid=photo_id).count() > 0:
-                print "Already downloaded %s/%s" % (collection,photoid)
+                                 photoid=photoid).count() > 0:
+                print "Already downloaded %s/%s" % (collection, photoid)
                 continue
 
 
-            # print photo_id
+            # print photoid
             # raise
 
-            rsp = GetPhotoAndMetaData(photo_id)
-            # print collection, photo_id, rsp['ImageJPG'][:10]
+            rsp = GetPhotoAndMetaData(photoid)
+            # print collection, photoid, rsp['ImageJPG'][:10]
 
             forcassandra = dict(
                     collection=collection,
-                    photoid=photo_id,
+                    photoid=photoid,
                     ImageJPG=rsp['ImageJPG'],
                     InfoJSON=rsp['InfoJSON'],
                     ExifJSON=rsp['ExifJSON'],
                     )
             flickrsot.create(**forcassandra)
-            print "Send to Cassandra %s/%s" % (collection,photoid)
+            print "Send to Cassandra %s/%s" % (collection, photoid)
             # print forcassandra
 
             # Insert one record into the users table
@@ -158,7 +111,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
             ################################################################
             # TO HBASE
             # table.put('row-key', {'collection:': collection,
-            #                       'photoid:': photo_id,
+            #                       'photoid:': photoid,
             #                       'ImageJPG:': rsp['ImageJPG'],
             #                       'InfoJSON:': rsp['InfoJSON'],
             #                       'ExifJSON:': rsp['ExifJSON']})
@@ -171,7 +124,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
             # prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
             # bound_stmt = prepared_stmt.bind([collection,
-            #                                 photo_id,
+            #                                 photoid,
             #                                 rsp['ImageJPG'],
             #                                 rsp['InfoJSON'],
             #                                 rsp['ExifJSON']])
