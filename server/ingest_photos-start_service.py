@@ -12,6 +12,8 @@ from flickr_helper import WriteFiles, WriteFilesToTar, GetPhotoAndMetaData
 
 
 import json
+import happybase
+
 
 
 # def WriteFiles(path='', photo_id=None):
@@ -90,9 +92,13 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
         tempdir = tempfile.mkdtemp()
 
+        connection = happybase.Connection('localhost')
+        table = connection.table('FlickrSOT')
+
+
         for kafkamessage in consumer:
 
-            print kafkamessage
+            # print kafkamessage
             # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
             try:
                 collection = json.loads(kafkamessage[3])['collection']  # 4='value'
@@ -102,7 +108,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
                 # raise
 
                 rsp = GetPhotoAndMetaData(photo_id)
-                print collection, photo_id, rsp['ImageJPG'][:10]
+                # print collection, photo_id, rsp['ImageJPG'][:10]
 
                 # forcassandra = dict(
                 #         collection=collection,
@@ -115,6 +121,21 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
                 # print forcassandra
 
                 # Insert one record into the users table
+
+                ################################################################
+                # TO HBASE
+                table.put('row-key', {'collection:': collection,
+                                      'photoid:': photo_id,
+                                      'ImageJPG:': rsp['ImageJPG'],
+                                      'InfoJSON:': rsp['InfoJSON'],
+                                      'ExifJSON:': rsp['ExifJSON']})
+
+
+                print "Sent to HBase photoid, ", photoid
+
+                ################################################################
+                # TO CASSANDRA
+
                 prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
                 bound_stmt = prepared_stmt.bind([collection,
                                                 photo_id,

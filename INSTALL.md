@@ -26,6 +26,8 @@ sudo pip install ./kafka-python
 
 
 
+
+
 add to parcel repository list
 http://archive-primary.cloudera.com/kafka/parcels/latest/
 or just download to/opt/cloudera/parcel-repo$
@@ -50,6 +52,8 @@ http://planetcassandra.org/getting-started-with-cassandra-and-python/
 
 
 
+# get rid of warnings@
+sudo pip install pyopenssl ndg-httpsclient pyasn1
 
 
 
