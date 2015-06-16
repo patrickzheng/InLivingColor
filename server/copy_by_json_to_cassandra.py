@@ -63,7 +63,10 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                CopyByJsonToCassandra(buff[:-1])
+                try:
+                    CopyByJsonToCassandra(buff[:-1])
+                except:
+                    pass
                 buff = ''
                 k = k + 1
 
