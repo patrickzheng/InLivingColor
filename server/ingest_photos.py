@@ -7,12 +7,17 @@
 # if args.verbosity:
 #     print "verbosity turned on"
 
-from _configuration import KAFKA_BROKER_LIST
+from _configuration import KAFKA_BROKER_LIST, KAFKA_PHOTOID_TOPIC
 
 from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter, GetInfoAsJson
 
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
+
+producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
+
+print producer
+
 
 import json
 import time
@@ -143,7 +148,6 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
 
     """
 
-    producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
     assert type(collection) is str
 
@@ -151,16 +155,15 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         assert type(photoid) is str
         #######################################################################
         # Send the message via Kafka
-        message_topic = 'downloadbyphotoid2'
         message_key = key if key is not None else photoid
         message = json.dumps(dict(collection=collection, photoid=str(photoid)))
         # '{"photoid": "3311097747", "collection": "leaves"}'
 
-        print "Sending Kafka Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
+        print "Sending Kafka Msg (topic=%s, key=%s, msg=%s)" % (KAFKA_PHOTOID_TOPIC,
                                                                 message_key,
                                                                 message)
         time.sleep(delay)
-        producer.send_messages(message_topic, message_key, message)
+        producer.send_messages(KAFKA_PHOTOID_TOPIC, message_key, message)
 
 
 if __name__ == '__main__':

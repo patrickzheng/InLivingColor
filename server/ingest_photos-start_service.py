@@ -2,7 +2,7 @@
 import threading
 import time
 
-from _configuration import KAFKA_BROKER_LIST
+from _configuration import KAFKA_BROKER_LIST, KAFKA_PHOTOID_TOPIC
 
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
@@ -46,7 +46,6 @@ sync_table(flickrsot)
 
 from random import shuffle
 
-
 def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
     """
     - dry_run (bool) : If True, will not download and will not write to cassandra.
@@ -56,7 +55,7 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
     brokers = KAFKA_BROKER_LIST.split(',')
     shuffle(brokers) # works in place
 
-    consumer = KafkaConsumer("downloadbyphotoid2",
+    consumer = KafkaConsumer(KAFKA_PHOTOID_TOPIC,
                              group_id="theonlygroup",
                              metadata_broker_list=brokers,
                              auto_commit_enable=True,
@@ -66,7 +65,7 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
                              )
     # producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
-    # print consumer
+    print consumer
 
     tempdir = tempfile.mkdtemp()
 
@@ -76,7 +75,7 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
 
     for kafkamessage in consumer:
 
-        print kafkamessage
+        # print kafkamessage
         # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
         try:
             collection = json.loads(kafkamessage[4])['collection']  # 4='value'
@@ -195,17 +194,17 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
 #             # try:
 #             #     tarfilestring = kafkamessage[4]  # 4='value'
 
-#             #     message_topic = 'test-tarfiles'
+#             #     KAFKA_PHOTOID_TOPIC = 'test-tarfiles'
 #             #     message_key = kafkamessage[3]  # 3='key'
 
-#             #     producer.send_messages(message_topic, message_key, message)
+#             #     producer.send_messages(KAFKA_PHOTOID_TOPIC, message_key, message)
 #             # except:
 #             #     pass
 
 #         # shutil.rmtree(tempdir)
 
 if __name__ == "__main__":
-    threading.Thread(target=ConsumePhotoIDandStoreDataInSourceOfTruth, kwargs=dict(dry_run=False))
+    threading.Thread(target=ConsumePhotoIDandStoreDataInSourceOfTruth, kwargs=dict(dry_run=False)).start()
     # ConsumeTarFileStringsAndUpload().start()
 
     while True:
