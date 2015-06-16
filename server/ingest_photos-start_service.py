@@ -58,7 +58,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
         brokers = KAFKA_BROKER_LIST.split(',')
         shuffle(brokers) # works in place
 
-        consumer = KafkaConsumer("downloadbyphotoid",
+        consumer = KafkaConsumer("downloadbyphotoid2",
                                  group_id="theonlygroup",
                                  metadata_broker_list=brokers,
                                  auto_commit_enable=True,
@@ -80,10 +80,11 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
             # print kafkamessage
             # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
             try:
-                collection = json.loads(kafkamessage[3])['collection']  # 4='value'
-                photoid = kafkamessage[4]  # 4='value'
+                collection = json.loads(kafkamessage[4])['collection']  # 4='value'
+                photoid = json.loads(kafkamessage[4])['photoid']  # 4='value'
 
-                # print "hi"
+                # print "hi",
+                # raise
 
                 if flickrsot.objects(collection=collection,
                                      photoid=photoid).count() > 0:

@@ -66,8 +66,8 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
         if dry_run is False:
             QueueIngestionByPhotoIDs(collection,
                                      photoids,
-                                     key=json.dumps(dict(collection=collection,
-                                                    page=page)),
+                                     # key=json.dumps(dict(collection=collection,
+                                     #                page=page)),
                                      skip_if_downloaded=skip_if_downloaded)
 
 
@@ -102,9 +102,9 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         assert type(photoid) is str
         #######################################################################
         # Send the message via Kafka
-        message_topic = 'downloadbyphotoid'
+        message_topic = 'downloadbyphotoid2'
         message_key = key if key is not None else photoid
-        message = str(photoid)
+        message = json.dumps(dict(collection=collection, photoid=str(photoid)))
         # '{"photoid": "3311097747", "collection": "leaves"}'
 
         print "Sending Kafka Msg (topic=%s, key=%s, msg=%s)" % (message_topic,
