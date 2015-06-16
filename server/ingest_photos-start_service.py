@@ -23,8 +23,6 @@ import subprocess
 from subprocess import call
 from cassandra.cluster import Cluster
 
-
-
 ######################################################
 # CQL ROCKS
 from cqlengine import columns
@@ -48,6 +46,7 @@ sync_table(flickrsot)
 
 from random import shuffle
 
+
 def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
     """
     - dry_run (bool) : If True, will not download and will not write to cassandra.
@@ -57,7 +56,7 @@ def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
     brokers = KAFKA_BROKER_LIST.split(',')
     shuffle(brokers) # works in place
 
-    consumer = KafkaConsumer(("downloadbyphotoid2",
+    consumer = KafkaConsumer("downloadbyphotoid2",
                              group_id="theonlygroup",
                              metadata_broker_list=brokers,
                              auto_commit_enable=True,
