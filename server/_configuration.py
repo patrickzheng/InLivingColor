@@ -2,6 +2,7 @@
 import os
 
 flickr_api_key = os.getenv('FLICKR_API_KEY')
+print "Using flickr API_KEY: ", flickr_api_key
 flickr_api_secret = os.getenv('FLICKR_API_SECRET')
 
 

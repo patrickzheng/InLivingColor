@@ -60,7 +60,7 @@ def GetSearchQueryAttrib(**kwargs):
     return photos.attrib
 
 
-def GetPhotoIDs_iter(page=None, **kwargs):
+def GetPhotoIDs_iter(page=None, max_number_of_pages=40, **kwargs):
     """
     - page : If a page number is specified, then return that page. If
              a page number is not specified, then return all pages.
@@ -77,7 +77,8 @@ def GetPhotoIDs_iter(page=None, **kwargs):
     # If a page number is not specified, then recursively obtain results
     # by making a call to this generator for each page in the search.
     else:
-        numberofpages = GetSearchQueryAttrib(**kwargs)['pages']
+        numberofpages = min(GetSearchQueryAttrib(**kwargs)['pages'], max_number_of_pages)
+
 
         for page in range(1,numberofpages+1):
             # print "Retreiving page %d"%page
@@ -88,6 +89,8 @@ def GetPhotos_iter(page=None, **kwargs):
     """
     - page : If a page number is specified, then return that page. If
              a page number is not specified, then return all pages.
+
+             Note that Flickr limits you to 4000 results
     """
 
 
@@ -115,15 +118,15 @@ def GetPhotoIDs_batch_iter(ctime_values, interval=60):
         min_taken_date = ctime
         max_taken_date = ctime+interval
 
-        for photo_id in GetPhotoIDs_iter(min_taken_date=min_taken_date, max_taken_date=max_taken_date):
-            yield photo_id
+        for photoid in GetPhotoIDs_iter(min_taken_date=min_taken_date, max_taken_date=max_taken_date):
+            yield photoid
 
 
 
 
-def GetMetaDataStrings(photo_id=None):
-    InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
-    ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
+def GetMetaDataStrings(photoid=None):
+    InfoJSON = flickr.photos.getInfo(photo_id=photoid, format="json")
+    ExifJSON = flickr.photos.getExif(photo_id=photoid, format="json")
     return InfoJSON, ExifJSON
 
 
@@ -136,46 +139,50 @@ def mkdir_p(path):
         else:
             raise
 
-def GetPhotoAndMetaData(photo_id):
-    # photo_id = photo.attrib['id']
+def GetInfoAsJson(photoid):
+    return flickr.photos.getInfo(photo_id=photoid, format="json")
+
+def GetExifAsJson(photoid):
+    return flickr.photos.getInfo(photo_id=photoid, format="json")
+
+def GetPhotoAndMetaData(photoid):
+    # photoid = photo.attrib['id']
 
     with tempfile.NamedTemporaryFile(delete=True) as f:
-        urllib.urlretrieve(photo_id2url(photo_id), f.name)
+        urllib.urlretrieve(photoid2url(photoid), f.name)
 
         ImageJPG = f.read()
 
-
-    InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
-    ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
-
-    return dict(ImageJPG=ImageJPG, InfoJSON=InfoJSON, ExifJSON=ExifJSON)
+    return dict(ImageJPG=ImageJPG,
+                InfoJSON=GetInfoAsJson(photoid),
+                ExifJSON=GetExifAsJson(photoid))
 
 
 
-def WriteFiles(path='', photo_id=None):
+def WriteFiles(path='', photoid=None):
 
     # path = os.path.join(path,)
 
-    mkdir_p(os.path.join(path, photo_id))
+    mkdir_p(os.path.join(path, photoid))
 
-    urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, photo_id, 'Image.jpg'))
+    urllib.urlretrieve(photoid2url(photoid), os.path.join(path, photoid, 'Image.jpg'))
 
-    InfoJSON = flickr.photos.getInfo(photo_id=photo_id, format="json")
-    ExifJSON = flickr.photos.getExif(photo_id=photo_id, format="json")
+    InfoJSON = flickr.photos.getInfo(photo_id=photoid, format="json")
+    ExifJSON = flickr.photos.getExif(photo_id=photoid, format="json")
 
-    with open(os.path.join(path, photo_id, 'Info.json'), 'w+') as f:
+    with open(os.path.join(path, photoid, 'Info.json'), 'w+') as f:
         f.write(InfoJSON)
 
-    with open(os.path.join(path, photo_id, 'Exif.json'), 'w+') as f:
+    with open(os.path.join(path, photoid, 'Exif.json'), 'w+') as f:
         f.write(ExifJSON)
 
 
-def WriteFilesToTar(photo_id=None):
+def WriteFilesToTar(photoid=None):
 
     tempdir = tempfile.mkdtemp()
     # print tempdir
 
-    WriteFiles(path=tempdir, photo_id=photo_id)
+    WriteFiles(path=tempdir, photoid=photoid)
 
     with tempfile.NamedTemporaryFile(delete=True) as f:
         # print f.name
@@ -192,7 +199,7 @@ def WriteFilesToTar(photo_id=None):
     return output
 
 
-def WriteFilesToS3(path='', photo_id=None):
+def WriteFilesToS3(path='', photoid=None):
 
     import boto
     conn = boto.connect_s3()
@@ -201,7 +208,7 @@ def WriteFilesToS3(path='', photo_id=None):
 
     tempdir = tempfile.mkdtemp()
     # print tempdir
-    WriteFiles(path=tempdir, photo_id=photo_id)
+    WriteFiles(path=tempdir, photoid=photoid)
 
     filenames = ['Info.json', 'Exif.json', 'Image.jpg']
 
@@ -214,7 +221,7 @@ def WriteFilesToS3(path='', photo_id=None):
     # import urllib2
     # import contextlib
 
-    # search_query = photo_id2url(photo_id)
+    # search_query = photoid2url(photoid)
 
     # with contextlib.closing(urllib.urlopen(search_query)) as x:
     #    ...use x at will here...
@@ -237,17 +244,17 @@ def WriteFilesToS3(path='', photo_id=None):
 
     # # mkdir_p(path)
 
-    # # wget.download(photo_id2url(photo_id), out=os.path.join(path, 'Image.jpg'))
-    # urllib.urlretrieve(photo_id2url(photo_id), os.path.join(path, 'Image.jpg'))
+    # # wget.download(photoid2url(photoid), out=os.path.join(path, 'Image.jpg'))
+    # urllib.urlretrieve(photoid2url(photoid), os.path.join(path, 'Image.jpg'))
 
 
     # # Write getInfo information to S3
-    # resp_str = flickr.photos.getInfo(photo_id=photo_id, format="json")
+    # resp_str = flickr.photos.getInfo(photo_id=photoid, format="json")
     # k = bucket.new_key(os.path.join(path, 'Info.json'))
     # k.set_contents_from_string(resp_str)
 
     # # Write getExif information to S3
-    # resp_str = flickr.photos.getExif(photo_id=photo_id, format="json")
+    # resp_str = flickr.photos.getExif(photo_id=photoid, format="json")
     # k = bucket.new_key(os.path.join(path, 'Info.json'))
     # k.set_contents_from_string(resp_str)
 
@@ -261,13 +268,13 @@ def WriteFilesToS3(path='', photo_id=None):
 
 
 
-# def WriteFiles_AppendTimeStamp(path='', photo_id=None):
+# def WriteFiles_AppendTimeStamp(path='', photoid=None):
 
 
-def photoid2getInfoResponse(photo_id):
+def photoid2getInfoResponse(photoid):
     """
     Returns the response (in LXML format) from the method flickr.photos.getInfo
-    given a photo_id. In JSON format it looks like
+    given a photoid. In JSON format it looks like
     {
       "photo": {
         "id": "16661925622",
@@ -324,39 +331,39 @@ def photoid2getInfoResponse(photo_id):
     }
     """
 
-    p = flickr.photos.getInfo(photo_id=photo_id)[0]
+    p = flickr.photos.getInfo(photo_id=photoid)[0]
     return p
 
 
-def photo_id2url(photo_id):
-    p = flickr.photos.getInfo(photo_id=photo_id)[0]
+def photoid2url(photoid):
+    p = flickr.photos.getInfo(photo_id=photoid)[0]
     return photo2url(p)
 
 def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
     return urlformat % photo.attrib
 
-# def photo2url(photo_id, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
-#     p = flickr.photos.getInfo(photo_id=photo_id)[0]
+# def photo2url(photoid, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
+#     p = flickr.photos.getInfo(photo_id=photoid)[0]
 #     return urlformat % p.attrib
 
 if __name__ == '__main__':
-    # WriteFiles(photo_id='16661925622')
+    # WriteFiles(photoid='16661925622')
     # ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
     # ctime_length = 60
     # ctime_interval = 60
     # ctime_mod = 1
-    # for photo_id in GetPhotoIDs_batch_iter(range(ctime_start,
+    # for photoid in GetPhotoIDs_batch_iter(range(ctime_start,
     #                                              ctime_start+ctime_length,
     #                                              ctime_interval*ctime_interval),
     #                                        interval=ctime_interval):
     #     print '.',
 
 
-    # string =  WriteFilesToTar(photo_id='2869316960')
+    # string =  WriteFilesToTar(photoid='2869316960')
 
     # with open("/tmp/test.tar",'w+b') as f:
     #     f.write(string)
 
-    output = GetPhotoAndMetaData(photo_id='2869316960')
+    output = GetPhotoAndMetaData(photoid='2869316960')
     print output['ImageJPG']
 

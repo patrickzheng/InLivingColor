@@ -9,15 +9,33 @@
 
 from _configuration import KAFKA_BROKER_LIST
 
-from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter
+from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter, GetInfoAsJson
 
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
 
 import json
+import time
+
+def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
+
+    photoidlistlist = []
+    print photoidlistlist
+    return
+
+    # while True:
+
+    query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime)),
+                 max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime+5*60)),
+                 per_page='100',
+                sort='date-posted-asc',
+                )
+    photoids = list(GetPhotoIDs_iter(max_number_of_pages=4, **query))
+    photoids = photoids[:min(4000,photoids)]
+    print photoids
 
 def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
-                                         skip_if_downloaded=False):
+                                         skip_if_downloaded=False, check_api_limit=True, limit_at_n=4000):
     """
     Queues the results of a FlickrAPI search query for downloading into an
     InLivingColor collection by sending message via Kafka to the cluster (i.e.,
@@ -39,8 +57,12 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
                                        have already been downloaded by
                                        checking the Cassandra database
                                        (not implemented)
+    - check_api_limit (bool) : if True, raise an exception when the query
+                               returns more than 4000 results, the Flickr
+                               limit
 
     """
+
 
     ###########################################################################
     # Get search query meta results, which look like this:
@@ -49,27 +71,52 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
     rsp = GetSearchQueryAttrib(**query)
     print "Initiating Flickr PhotoID Search (%s results)" % rsp['total']
 
+    if check_api_limit is True:
+        # We cannot download more than 4000 distinct photoids, so make sure your
+        # searches contain less than this amount
+        assert int(rsp['total']) <= 4000
+
     ###########################################################################
     # Download the photoids from the server page by page
 
-    numberofpages = int(rsp['pages'])
+    numpages = int(rsp['pages'])
 
-    for page in range(1,numberofpages+1):
+    wholelistofphotoids = []
+
+    count = 0
+
+    for page in range(1, numpages +1):
 
         # Put photoids from this page into a list
         photoids = list(GetPhotoIDs_iter(page=str(page), **query))
+
+        if limit_at_n > 0:
+            count += len(photoids)
+            print "(%d photoids so far)" % count
+            if count >= limit_at_n:
+                break
+
+        wholelistofphotoids += photoids
+
+
+        # for photoid in [photoids[0],photoids[-1]]:
+        #     # print photoid
+        #     # print json.loads(photoid2getInfoResponse(photoid))
+        #     dateposted = float(json.loads(GetInfoAsJson(photoid))['photo']['dates']['posted'])
+        #     print photoid, time.ctime(dateposted)
 
         print "Downloading page %s/%s" % (page, rsp['pages']),
         print "%s ... %s" % (photoids[0],photoids[-1])
 
         # Send
-        if dry_run is False:
-            QueueIngestionByPhotoIDs(collection,
-                                     photoids,
-                                     # key=json.dumps(dict(collection=collection,
-                                     #                page=page)),
-                                     skip_if_downloaded=skip_if_downloaded)
+    if dry_run is False:
+        QueueIngestionByPhotoIDs(collection,
+                                 photoids,
+                                 # key=json.dumps(dict(collection=collection,
+                                 #                page=page)),
+                                 skip_if_downloaded=skip_if_downloaded)
 
+    return wholelistofphotoids
 
 def QueueIngestionByPhotoIDs(collection, photoids, key=None,
                              skip_if_downloaded=False):

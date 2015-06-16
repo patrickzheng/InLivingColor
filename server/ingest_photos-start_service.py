@@ -48,109 +48,101 @@ sync_table(flickrsot)
 
 from random import shuffle
 
-class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
-    daemon = True
-
-    def __init__(self, dry_run=False):
-        """
-        - dry_run (bool) : If True, will not download and will not write to cassandra.
-        """
-
-        self.dry_run = dry_run
+def ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=False):
+    """
+    - dry_run (bool) : If True, will not download and will not write to cassandra.
+    """
 
 
-    def run(self):
-        # cluster = Cluster()
-        # session = cluster.connect('inlivingcolor')
+    brokers = KAFKA_BROKER_LIST.split(',')
+    shuffle(brokers) # works in place
 
-        brokers = KAFKA_BROKER_LIST.split(',')
-        shuffle(brokers) # works in place
+    consumer = KafkaConsumer(("downloadbyphotoid2",
+                             group_id="theonlygroup",
+                             metadata_broker_list=brokers,
+                             auto_commit_enable=True,
+                             auto_commit_interval_messages=50,
+                             auto_commit_interval_ms=10*1000,
 
-        consumer = KafkaConsumer("downloadbyphotoid2",
-                                 group_id="theonlygroup",
-                                 metadata_broker_list=brokers,
-                                 auto_commit_enable=True,
-                                 auto_commit_interval_messages=50,
-                                 auto_commit_interval_ms=10*1000,
-                                 )
-        # producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
+                             )
+    # producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
-        # print consumer
+    # print consumer
 
-        tempdir = tempfile.mkdtemp()
+    tempdir = tempfile.mkdtemp()
 
-        # connection = happybase.Connection('localhost')
-        # table = connection.table('FlickrSOT')
+    # connection = happybase.Connection('localhost')
+    # table = connection.table('FlickrSOT')
 
 
-        for kafkamessage in consumer:
+    for kafkamessage in consumer:
 
-            # print kafkamessage
-            # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
-            try:
-                collection = json.loads(kafkamessage[4])['collection']  # 4='value'
-                photoid = json.loads(kafkamessage[4])['photoid']  # 4='value'
+        print kafkamessage
+        # KafkaMessage(topic='test-downloadbyphotoid', partition=2, offset=113, key='{"page": 4, "collection": "leaves"}', value='3485994635')
+        try:
+            collection = json.loads(kafkamessage[4])['collection']  # 4='value'
+            photoid = json.loads(kafkamessage[4])['photoid']  # 4='value'
 
-                # print "hi",
-                # raise
+            # print "hi",
+            # raise
 
-                if flickrsot.objects(collection=collection,
-                                     photoid=photoid).count() > 0:
-                    print "Already downloaded %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
-                    continue
-
-
-                # print photoid
-                # raise
-                if dry_run is False:
-                    rsp = GetPhotoAndMetaData(photoid)
-                    # print collection, photoid, rsp['ImageJPG'][:10]
-
-                    forcassandra = dict(
-                            collection=collection,
-                            photoid=photoid,
-                            imagejpg=rsp['ImageJPG'],
-                            infojson=rsp['InfoJSON'],
-                            exifjson=rsp['ExifJSON'],
-                            )
-                    flickrsot.create(**forcassandra)
-
-                print "Sent to Cassandra %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
-
-                ### TODO: print partition
-                # print forcassandra
-
-                # Insert one record into the users table
-
-                ################################################################
-                # TO HBASE
-                # table.put('row-key', {'collection:': collection,
-                #                       'photoid:': photoid,
-                #                       'ImageJPG:': rsp['ImageJPG'],
-                #                       'InfoJSON:': rsp['InfoJSON'],
-                #                       'ExifJSON:': rsp['ExifJSON']})
+            if flickrsot.objects(collection=collection,
+                                 photoid=photoid).count() > 0:
+                print "Already downloaded %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
+                continue
 
 
-                # print "Sent to HBase photoid, ", photoid
+            # print photoid
+            # raise
+            if dry_run is False:
+                rsp = GetPhotoAndMetaData(photoid)
+                # print collection, photoid, rsp['ImageJPG'][:10]
 
-                ################################################################
-                # TO CASSANDRA
+                forcassandra = dict(
+                        collection=collection,
+                        photoid=photoid,
+                        imagejpg=rsp['ImageJPG'],
+                        infojson=rsp['InfoJSON'],
+                        exifjson=rsp['ExifJSON'],
+                        )
+                flickrsot.create(**forcassandra)
 
-                # prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
-                # bound_stmt = prepared_stmt.bind([collection,
-                #                                 photoid,
-                #                                 rsp['ImageJPG'],
-                #                                 rsp['InfoJSON'],
-                #                                 rsp['ExifJSON']])
+            print "Sent to Cassandra %s/%s (partition: %d)" % (collection, photoid, kafkamessage[1])
 
-                # stmt = session.execute(bound_stmt)
+            ### TODO: print partition
+            # print forcassandra
 
-                # print "Sent to cassandra photoid, ", photoid
+            # Insert one record into the users table
 
-            except:
-                pass
+            ################################################################
+            # TO HBASE
+            # table.put('row-key', {'collection:': collection,
+            #                       'photoid:': photoid,
+            #                       'ImageJPG:': rsp['ImageJPG'],
+            #                       'InfoJSON:': rsp['InfoJSON'],
+            #                       'ExifJSON:': rsp['ExifJSON']})
 
-        shutil.rmtree(tempdir)
+
+            # print "Sent to HBase photoid, ", photoid
+
+            ################################################################
+            # TO CASSANDRA
+
+            # prepared_stmt = session.prepare("INSERT INTO flickrsot (collection, photoid, imagejpg, infojson, exifjson) VALUES (?, ?, ?, ?, ?)")
+            # bound_stmt = prepared_stmt.bind([collection,
+            #                                 photoid,
+            #                                 rsp['ImageJPG'],
+            #                                 rsp['InfoJSON'],
+            #                                 rsp['ExifJSON']])
+
+            # stmt = session.execute(bound_stmt)
+
+            # print "Sent to cassandra photoid, ", photoid
+
+        except:
+            pass
+
+    shutil.rmtree(tempdir)
 
 
 # CREATE TABLE FlickrSOT ( collection text, photoid text, ImageJPG blob, InfoJSON text, ExifJSON text, PRIMARY KEY (collection,  photoid));# class ConsumeTarFileStringsAndUpload(threading.Thread):
@@ -214,7 +206,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 #         # shutil.rmtree(tempdir)
 
 if __name__ == "__main__":
-    ConsumePhotoIDandStoreDataInSourceOfTruth(dry_run=True).start()
+    threading.Thread(target=ConsumePhotoIDandStoreDataInSourceOfTruth, kwargs=dict(dry_run=False))
     # ConsumeTarFileStringsAndUpload().start()
 
     while True:
