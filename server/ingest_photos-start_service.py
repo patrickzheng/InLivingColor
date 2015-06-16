@@ -46,7 +46,7 @@ connection.setup(['127.0.0.1'], "inlivingcolor")
 from cqlengine.management import sync_table
 sync_table(flickrsot)
 
-
+from random import shuffle
 
 class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
     daemon = True
@@ -58,7 +58,7 @@ class ConsumePhotoIDandStoreDataInSourceOfTruth(threading.Thread):
 
         consumer = KafkaConsumer("downloadbyphotoid",
                                  group_id="theonlygroup",
-                                 metadata_broker_list=KAFKA_BROKER_LIST.split(',')[:],
+                                 metadata_broker_list=shuffle(KAFKA_BROKER_LIST.split(',')),
                                  auto_commit_enable=True,
                                  auto_commit_interval_messages=50,
                                  auto_commit_interval_ms=10*1000,
