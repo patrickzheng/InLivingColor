@@ -151,6 +151,7 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
 
 
     assert type(collection) is str
+    print "-> Kafka(topic=%s)" % KAFKA_PHOTOID_TOPIC,
 
     for photoid in photoids:
         assert type(photoid) is str
@@ -158,11 +159,17 @@ def QueueIngestionByPhotoIDs(collection, photoids, key=None,
         # Send the message via Kafka
         message_key = key if key is not None else photoid
         message = json.dumps(dict(collection=collection, photoid=str(photoid)))
+
+
+        print photoid,
         # '{"photoid": "3311097747", "collection": "leaves"}'
 
-        print "-> Kafka(topic=%s, key=%s, msg=%s)" % (KAFKA_PHOTOID_TOPIC,
-                                                                message_key,
-                                                                message)
+        # print "-> Kafka(topic=%s, key=%s, msg=%s)" % (KAFKA_PHOTOID_TOPIC,
+        #                                                         message_key,
+        #                                                         message)
+         # % (KAFKA_PHOTOID_TOPIC,
+         #                                                        message_key,
+         #                                                        message)
         time.sleep(delay)
         producer.send_messages(KAFKA_PHOTOID_TOPIC, message_key, message)
 

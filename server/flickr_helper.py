@@ -14,6 +14,9 @@ from _configuration import flickr_api_key, flickr_api_secret
 
 flickr = flickrapi.FlickrAPI(flickr_api_key, flickr_api_secret)
 
+import boto
+conn = boto.connect_s3()
+bucket = conn.get_bucket('inlivingcolor')
 
 
 def GetSearchQueryAttrib(**kwargs):
@@ -153,9 +156,9 @@ def GetPhotoAndMetaData(photoid):
 
         ImageJPG = f.read()
 
-    return dict(ImageJPG=ImageJPG,
-                InfoJSON=GetInfoAsJson(photoid),
-                ExifJSON=GetExifAsJson(photoid))
+    return dict(imagejpg=ImageJPG,
+                infojson=GetInfoAsJson(photoid),
+                exifjson=GetExifAsJson(photoid))
 
 
 
@@ -165,57 +168,55 @@ def WriteFiles(path='', photoid=None):
 
     mkdir_p(os.path.join(path, photoid))
 
-    urllib.urlretrieve(photoid2url(photoid), os.path.join(path, photoid, 'Image.jpg'))
+    urllib.urlretrieve(photoid2url(photoid), os.path.join(path, photoid, 'image.jpg'))
 
     InfoJSON = flickr.photos.getInfo(photo_id=photoid, format="json")
     ExifJSON = flickr.photos.getExif(photo_id=photoid, format="json")
 
-    with open(os.path.join(path, photoid, 'Info.json'), 'w+') as f:
+    with open(os.path.join(path, photoid, 'info.json'), 'w+') as f:
         f.write(InfoJSON)
 
-    with open(os.path.join(path, photoid, 'Exif.json'), 'w+') as f:
+    with open(os.path.join(path, photoid, 'exif.json'), 'w+') as f:
         f.write(ExifJSON)
 
+def WritePhotoAndMetaToS3(collection, photoid, photoandmetadict):
 
-def WriteFilesToTar(photoid=None):
+    binstr = "%02d" % (hash(str(photoid)) % 100)
 
-    tempdir = tempfile.mkdtemp()
-    # print tempdir
+    # print os.path.join(collection, binstr, photoid, filename)
 
-    WriteFiles(path=tempdir, photoid=photoid)
+    # with tempfile.NamedTemporaryFile(delete=True) as f:
+    #     f.write(photoandmetadict['imagejpg'])
+    #     k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
+    #     k.set_contents_from_filename(f.name)
 
-    with tempfile.NamedTemporaryFile(delete=True) as f:
-        # print f.name
+    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
+    k.set_contents_from_string(photoandmetadict['imagejpg'])
+    k.make_public()
 
-        command = ['tar', '-cf', f.name, '-C', tempdir, '.']
-        # print command
+    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'info.json'))
+    k.set_contents_from_string(photoandmetadict['infojson'])
+    k.make_public()
 
-        subprocess.call(command)
-
-        output = f.read()
-
-    shutil.rmtree(tempdir)
-
-    return output
+    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'exif.json'))
+    k.set_contents_from_string(photoandmetadict['exifjson'])
+    k.make_public()
 
 
-def WriteFilesToS3(path='', photoid=None):
+def WritePhotoToS3(path='', photoid=None):
 
-    import boto
-    conn = boto.connect_s3()
-    bucket = conn.get_bucket('insight-brian-inlivingcolor')
     # import urllib2
 
     tempdir = tempfile.mkdtemp()
     # print tempdir
     WriteFiles(path=tempdir, photoid=photoid)
 
-    filenames = ['Info.json', 'Exif.json', 'Image.jpg']
+    filenames = ['info.json', 'exif.json', 'image.jpg']
 
     for filename in filenames:
 
         k = bucket.new_key(os.path.join(path, filename))
-        k.set_contents_from_filename(os.path.join(tempdir, filename))
+        k.set_contents_from_string(os.path.join(tempdir, filename))
 
     shutil.rmtree(tempdir)
     # import urllib2

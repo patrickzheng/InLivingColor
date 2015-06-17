@@ -2,7 +2,7 @@ import sys
 import time
 import json
 
-from flickr_helper import GetPhotoAndMetaData
+from flickr_helper import GetPhotoAndMetaData, WritePhotoAndMetaToS3
 
 ######################################################
 # CQL ROCKS
@@ -11,19 +11,18 @@ from cqlengine.models import Model
 from cqlengine import connection
 
 # Define a model
-class flickrsot(Model):
+class flickrmetasot(Model):
     collection = columns.Text(primary_key=True)
     photoid = columns.Text(primary_key=True)
-    imagejpg = columns.Blob()
     infojson = columns.Text()
     exifjson = columns.Text()
     def __repr__(self):
-        return '<sourceoftruth: collection=%s photoid=%s %d-byte jpg>' % (self.collection, self.photoid, len(self.imagejpg))
+        return '<sourceoftruth: collection=%s photoid=%s>' % (self.collection, self.photoid)
 
 connection.setup(['127.0.0.1'], "inlivingcolor")
 
 from cqlengine.management import sync_table
-sync_table(flickrsot)
+sync_table(flickrmetasot)
 
 def CopyByJsonToCassandra(jsoninput):
 
@@ -31,29 +30,36 @@ def CopyByJsonToCassandra(jsoninput):
     photoid = json.loads(jsoninput)['photoid']  # 4='value'
 
 
-    if flickrsot.objects(collection=collection,
+    if flickrmetasot.objects(collection=collection,
                          photoid=photoid).count() > 0:
         print "Already downloaded %s/%s" % (collection, photoid)
         return
 
 
-    rsp = GetPhotoAndMetaData(photoid)
-    # print collection, photoid, rsp['ImageJPG'][:10]
+    photoandmetadict = GetPhotoAndMetaData(photoid)
+    # print collection, photoid, photoandmetadict['ImageJPG'][:10]
 
     forcassandra = dict(
             collection=collection,
             photoid=photoid,
-            imagejpg=rsp['ImageJPG'],
-            infojson=rsp['InfoJSON'],
-            exifjson=rsp['ExifJSON'],
+            infojson=photoandmetadict['infojson'],
+            exifjson=photoandmetadict['exifjson'],
             )
-    flickrsot.create(**forcassandra)
+    flickrmetasot.create(**forcassandra)
 
     print "Sent to Cassandra %s/%s" % (collection, photoid)
 
+    WritePhotoAndMetaToS3(collection, photoid, photoandmetadict)
+
+    print "Copied to S3 to Cassandra %s/%s" % (collection, photoid)
+
 
 if __name__ == '__main__':
-    # Unbuffered reading of the stream
+
+
+    # Unbuffered reading of the stream. Yes, this code is necessary, because
+    # python's "input files" does not read continuously, rather only when
+    # the pipe closes
     k = 0
 
     try:
@@ -63,10 +69,12 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                try:
-                    CopyByJsonToCassandra(buff[:-1])
-                except:
-                    pass
+                # try:
+                CopyByJsonToCassandra(buff[:-1])
+                # except KeyboardInterrupt:
+                #     raise
+                # except:
+                #     pass
                 buff = ''
                 k = k + 1
 

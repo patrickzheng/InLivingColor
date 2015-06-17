@@ -59,6 +59,35 @@ sudo pip install blist
 
 
 
+Install Parlsey
+
+git clone
+https://github.com/Parsely/pyspark-cassandra
+
+mvn clean package
+
+
+------------------------------
+
+
+for pyspark
+28
+down vote
+accepted
+I solved this problem temporary by disabling the dfs permission.By adding below property code to conf/hdfs-site.xml
+
+  <property>
+    <name>dfs.permissions</name>
+    <value>false</value>
+  </property>
+
+
+You should do this in the CDH console
+
+
+
+
+
 
 
 
