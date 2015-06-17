@@ -202,6 +202,13 @@ def WritePhotoAndMetaToS3(collection, photoid, photoandmetadict):
     k.set_contents_from_string(photoandmetadict['exifjson'])
     k.make_public()
 
+    k = bucket.new_key(os.path.join(collection, binstr, photoid,
+                       'DOWNLOAD_AND_WRITE_SUCCEEDED'))
+    k.set_contents_from_string("")
+    # k.make_public()
+
+
+
 
 def WritePhotoToS3(path='', photoid=None):
 
