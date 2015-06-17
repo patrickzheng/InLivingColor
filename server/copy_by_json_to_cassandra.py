@@ -69,12 +69,12 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                # try:
-                CopyByJsonToCassandra(buff[:-1])
-                # except KeyboardInterrupt:
-                #     raise
-                # except:
-                #     pass
+                try:
+                    CopyByJsonToCassandra(buff[:-1])
+                except KeyboardInterrupt:
+                    raise
+                except:
+                    pass
                 buff = ''
                 k = k + 1
 
