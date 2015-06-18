@@ -24,7 +24,7 @@ if __name__ == '__main__':
                         sort='date-posted-asc',
                         )
 
-            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=1.0)
+            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=0.05)
 
             timeelapsed = int(time.time()) - now
             print "TIMEELAPSED (should be less than 5 mins): %d"%timeelapsed

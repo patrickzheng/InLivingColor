@@ -45,9 +45,12 @@ def DownloadPreprocessAndStore(jsoninput):
     clusters = GetColorClusteringMetadataFromJPG(photoandmetadict['imagejpg'])
     infodict = json.loads(photoandmetadict['infojson'])['photo']
     exifdict = json.loads(photoandmetadict['exifjson'])['photo']
-    metaplusjson = json.dumps(dict(clusters=clusters,
+    metaplusjson = json.dumps(dict(collection=collection,
+                                   photoid=photoid,
+                                   clusters=clusters,
                                    info=infodict,
-                                   exif=exifdict))
+                                   exif=exifdict,
+                                   ))
 
     # print collection, photoid, photoandmetadict['ImageJPG'][:10]
     # TODO: add more checks here, see if the data we need is here

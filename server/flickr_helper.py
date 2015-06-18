@@ -219,24 +219,29 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
 
     binstr = "%02d" % (hash(str(photoid)) % 100)
 
-    # print os.path.join(collection, binstr, photoid, filename)
+    # print os.path.join(collection, photoid, filename)
 
     # with tempfile.NamedTemporaryFile(delete=True) as f:
     #     f.write(photoandmetadict['imagejpg'])
-    #     k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
+    #     k = bucket.new_key(os.path.join(collection, photoid, 'image.jpg'))
     #     k.set_contents_from_filename(f.name)
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
+    k = bucket.new_key(os.path.join(collection, photoid, 'image.jpg'))
     k.set_contents_from_string(jpgdata)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'metaplus.json'))
+    k = bucket.new_key(os.path.join(collection, photoid, 'metaplus.json'))
     k.set_contents_from_string(metaplusjson)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid,
+    k = bucket.new_key(os.path.join(collection, photoid,
                        'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
     k.set_contents_from_string("")
+
+    # k = bucket.new_key(os.path.join(collection, photoid,
+    #                    'NEW'))
+    k.set_contents_from_string("")
+
     # k.make_public()
 
 

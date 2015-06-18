@@ -4,7 +4,6 @@ NUM_SPAWNS=$1
 SESSION=downloading
 
 tmux kill-session -t $SESSION
-# tmux new-session -s downloading -n bash -d
 tmux new-session -s $SESSION -n bash -d
 
 COMMAND="kafka-console-consumer --zookeeper localhost:2181 --consumer.config consumerconfig.txt --topic test-downloadbyphotoid | python download_preprocess_store.py"
