@@ -6,7 +6,7 @@ SESSION=downloading
 tmux kill-session -t $SESSION
 tmux new-session -s $SESSION -n bash -d
 
-COMMAND="kafka-console-consumer --zookeeper localhost:2181 --consumer.config consumerconfig.txt --topic test-downloadbyphotoid | python download_preprocess_store.py"
+COMMAND="kafka-console-consumer --zookeeper localhost:2181 --consumer.config consumerconfig.txt --topic downloadpreprocessandstore | python download_preprocess_store.py"
 # COMMAND='sleep 5'
 
 # tmux send-keys -t $SESSION:$ID '$COMMAND' C-m

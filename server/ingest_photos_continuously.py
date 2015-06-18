@@ -5,7 +5,7 @@ from ingest_photos import QueueIngestionByFlickrAPISearchQuery
 # kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
 
 if __name__ == '__main__':
-    collection = "recent"
+    collection = "stream"
 
     now = int(time.time())
     adayago = now - 24*3600
