@@ -5,7 +5,7 @@ from ingest_photos import QueueIngestionByFlickrAPISearchQuery
 # kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
 
 if __name__ == '__main__':
-    collection = "allrecent"
+    collection = "recent"
 
     now = int(time.time())
     adayago = now - 24*3600
@@ -24,7 +24,7 @@ if __name__ == '__main__':
                         sort='date-posted-asc',
                         )
 
-            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=0.025)
+            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=1.0)
 
             timeelapsed = int(time.time()) - now
             print "TIMEELAPSED (should be less than 5 mins): %d"%timeelapsed

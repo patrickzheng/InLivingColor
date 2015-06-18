@@ -9,7 +9,6 @@ import shutil
 import tarfile
 import subprocess
 
-
 from _configuration import flickr_api_key, flickr_api_secret
 
 flickr = flickrapi.FlickrAPI(flickr_api_key, flickr_api_secret)
@@ -179,7 +178,44 @@ def WriteFiles(path='', photoid=None):
     with open(os.path.join(path, photoid, 'exif.json'), 'w+') as f:
         f.write(ExifJSON)
 
-def WritePhotoAndMetaToS3(collection, photoid, photoandmetadict):
+def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'):
+    import tempfile
+    import matplotlib.image as mpimg
+    import numpy as np
+    from scipy.cluster.vq import kmeans2
+    import json
+
+    from PIL import ImageFile
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+    try:
+
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(jpgdata)
+            img=mpimg.imread(f.name)
+
+        imgflat = img.reshape(-1,3)[::50]/256.0
+#         imgflat = img.reshape(-1,3)[::50]/256.0*0+0.5+np.random.randn(imgflat.shape[0],img.shape[2])*0.0001
+
+        output = {}
+
+        for numberofcolors in ks:
+            centroids,labels = kmeans2(imgflat,numberofcolors,iter=50)
+
+
+            labelsums = np.array(map(lambda i: sum(labels==i),range(numberofcolors)))
+            labelprobs = 1.0*labelsums / sum(labelsums)
+            output[numberofcolors] = dict(centroids={i+1:tuple(centroids[i]) for i in range(numberofcolors)},
+                                                    probs={i+1:labelprobs[i] for i in range(numberofcolors)})
+
+            output['maxk'] = numberofcolors
+
+        return output
+    except:
+        return 'None'
+
+
+def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
 
     binstr = "%02d" % (hash(str(photoid)) % 100)
 
@@ -191,19 +227,15 @@ def WritePhotoAndMetaToS3(collection, photoid, photoandmetadict):
     #     k.set_contents_from_filename(f.name)
 
     k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
-    k.set_contents_from_string(photoandmetadict['imagejpg'])
+    k.set_contents_from_string(jpgdata)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'info.json'))
-    k.set_contents_from_string(photoandmetadict['infojson'])
-    k.make_public()
-
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'exif.json'))
-    k.set_contents_from_string(photoandmetadict['exifjson'])
+    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'metaplus.json'))
+    k.set_contents_from_string(metaplusjson)
     k.make_public()
 
     k = bucket.new_key(os.path.join(collection, binstr, photoid,
-                       'DOWNLOAD_AND_WRITE_SUCCEEDED'))
+                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
     k.set_contents_from_string("")
     # k.make_public()
 
@@ -354,7 +386,9 @@ def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s
 #     p = flickr.photos.getInfo(photo_id=photoid)[0]
 #     return urlformat % p.attrib
 
+
 if __name__ == '__main__':
+    pass
     # WriteFiles(photoid='16661925622')
     # ctime_start = int(time.mktime(time.strptime("30-11-2010 00:00", "%d-%m-%Y %H:%M")))
     # ctime_length = 60
@@ -372,6 +406,6 @@ if __name__ == '__main__':
     # with open("/tmp/test.tar",'w+b') as f:
     #     f.write(string)
 
-    output = GetPhotoAndMetaData(photoid='2869316960')
-    print output['ImageJPG']
+    # output = GetPhotoAndMetaData(photoid='2869316960')
+    # print output['ImageJPG']
 

@@ -5,6 +5,11 @@ flickr_api_key = os.getenv('FLICKR_API_KEY')
 print "Using flickr API_KEY: ", flickr_api_key
 flickr_api_secret = os.getenv('FLICKR_API_SECRET')
 
+
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+print "Using AWS_ACCESS_KEY_ID: ", AWS_ACCESS_KEY_ID
+
 KAFKA_PHOTOID_TOPIC = 'test-downloadbyphotoid'
 
 

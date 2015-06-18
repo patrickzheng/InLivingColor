@@ -21,18 +21,18 @@ class flickrmetaplus(Model):
 connection.setup(['127.0.0.1'], "inlivingcolor")
 
 from cqlengine.management import sync_table
-sync_table(flickrmetasot)
+sync_table(flickrmetaplus)
 
 
 
 
-def CopyByJsonToCassandra(jsoninput):
+def DownloadPreprocessAndStore(jsoninput):
 
     collection = json.loads(jsoninput)['collection']  # 4='value'
     photoid = json.loads(jsoninput)['photoid']  # 4='value'
 
     # TODO, replace this checking with checking S3, the source of truth after all
-    if flickrmetasot.objects(collection=collection,
+    if flickrmetaplus.objects(collection=collection,
                          photoid=photoid).count() > 0:
         print "Already downloaded %s/%s" % (collection, photoid)
         return
@@ -40,26 +40,32 @@ def CopyByJsonToCassandra(jsoninput):
 
 # bucket.get_key(os.path.join(collection, binstr, photoid, 'DOWNLOAD_AND_WRITE_SUCCEEDED'))
 # get_key()
+    photoandmetadict = GetPhotoAndMetaData(photoid)
+
     clusters = GetColorClusteringMetadataFromJPG(photoandmetadict['imagejpg'])
-    infojson = json.loads(photoandmetadict['infojson'])['photo']
-    exifjson = json.loads(photoandmetadict['exifjson'])['photo']
-    metaplusjson = dict(clusters=clusters,
-                        infojson=infojson,
-                        exifjson=exifjson)
+    infodict = json.loads(photoandmetadict['infojson'])['photo']
+    exifdict = json.loads(photoandmetadict['exifjson'])['photo']
+    metaplusjson = json.dumps(dict(clusters=clusters,
+                                   info=infodict,
+                                   exif=exifdict))
 
     # print collection, photoid, photoandmetadict['ImageJPG'][:10]
-    # TODO: add more checks here
+    # TODO: add more checks here, see if the data we need is here
 
     forcassandra = dict(
             collection=collection,
             photoid=photoid,
-            metaplusjson=json.dumps(metaplusjson),
+            metaplusjson=metaplusjson,
             )
-    flickrmetasot.create(**forcassandra)
+    flickrmetaplus.create(**forcassandra)
 
     print "Sent to Cassandra %s/%s" % (collection, photoid)
 
-    WritePhotoAndMetaToS3(collection, photoid, photoandmetadict)
+    WritePhotoAndMetaToS3(collection,
+                          photoid,
+                          photoandmetadict['imagejpg'],
+                          metaplusjson
+                          )
 
     print "Copied to S3 to Cassandra %s/%s" % (collection, photoid)
 
@@ -79,13 +85,14 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                try:
-                    CopyByJsonToCassandra(buff[:-1])
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    print 'Error processing msg: ', buff[:-1]
-                    pass
+                DownloadPreprocessAndStore(buff[:-1])
+                # try:
+                #     DownloadPreprocessAndStore(buff[:-1])
+                # except KeyboardInterrupt:
+                #     raise
+                # except:
+                #     print 'Error processing msg: ', buff[:-1]
+                #     pass
                 buff = ''
                 k = k + 1
 
