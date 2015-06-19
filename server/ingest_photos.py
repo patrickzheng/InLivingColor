@@ -24,21 +24,21 @@ print producer
 import json
 import time
 
-def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
+# def SmartQueueIngestionByDateUploaded(collection, startctime, dry_run=False):
 
-    while True:
+#     while True:
 
-        print startctime
+#         print startctime
 
 
-        query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime)),
-                     max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime+10*60)),
-                    sort='date-posted-asc',
-                    )
-        QueueIngestionByFlickrAPISearchQuery(collection=collection,query=query,dry_run=dry_run, limit_at_n=4000)
+#         query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime)),
+#                      max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(startctime+10*60)),
+#                     sort='date-posted-asc',
+#                     )
+#         QueueIngestionByFlickrAPISearchQuery(collection=collection,query=query,dry_run=dry_run, limit_at_n=4000)
 
-        startctime += 10*60
-        # print photoids
+#         startctime += 10*60
+#         # print photoids
 
 def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
                                          skip_if_downloaded=False, check_api_limit=False, limit_at_n=4000, delay=0.1):

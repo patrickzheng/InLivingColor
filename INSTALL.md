@@ -86,6 +86,13 @@ You should do this in the CDH console
 
 
 
+run each time you reboot
+
+sudo $REDIS_HOME/src/redis-server $REDIS_HOME/redis.conf &
+cassandra
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 5000
+
+install stratio
 
 
 
