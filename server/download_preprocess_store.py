@@ -47,6 +47,7 @@ def DownloadPreprocessAndStore(jsoninput):
     exifdict = json.loads(photoandmetadict['exifjson'])['photo']
     metaplusjson = json.dumps(dict(collection=collection,
                                    photoid=photoid,
+                                   secret=(int(photoid)*13) % 100,
                                    clusters=clusters,
                                    info=infodict,
                                    exif=exifdict,
