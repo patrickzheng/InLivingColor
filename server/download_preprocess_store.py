@@ -4,7 +4,11 @@ import json
 
 from _configuration import S3_BUCKET
 
-from flickr_helper import GetPhotoAndMetaData, WritePhotoAndMetaToS3, CheckIfDownloadedAndPreprocessed
+from flickr_helper import GetPhotoAndMetaData
+from flickr_helper import WritePhotoAndMetaToS3
+from flickr_helper import CheckIfDownloadedAndPreprocessed
+from flickr_helper import GetColorClusteringMetadataFromJPG
+
 
 ######################################################
 # CQL ROCKS
@@ -98,14 +102,14 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                # DownloadPreprocessAndStore(buff[:-1])
-                try:
-                    DownloadPreprocessAndStore(buff[:-1])
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    print 'Error processing msg: ', buff[:-1]
-                    pass
+                DownloadPreprocessAndStore(buff[:-1])
+                # try:
+                #     DownloadPreprocessAndStore(buff[:-1])
+                # except KeyboardInterrupt:
+                #     raise
+                # except:
+                #     print 'Error processing msg: ', buff[:-1]
+                #     pass
                 buff = ''
                 k = k + 1
 
