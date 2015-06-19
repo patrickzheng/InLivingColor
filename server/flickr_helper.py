@@ -215,6 +215,18 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
         return 'None'
 
 
+def CheckIfDownloadedAndPreprocessed(collection, photoid):
+    binstr = "%02d" % ((int(photoid)*13) % 100)
+
+    keyname = os.path.join(collection, binstr, photoid,
+                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED')
+
+    if bucket.get_key(keyname) is not None:
+        return True
+    else:
+        return False
+
+
 def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
 
     binstr = "%02d" % ((int(photoid)*13) % 100)

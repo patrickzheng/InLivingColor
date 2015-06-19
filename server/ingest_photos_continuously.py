@@ -5,7 +5,7 @@ from ingest_photos import QueueIngestionByFlickrAPISearchQuery
 # kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
 
 if __name__ == '__main__':
-    collection = "omega"
+    collection = "has_geo"
     print "collection: ", collection
 
     now = int(time.time())
@@ -22,6 +22,7 @@ if __name__ == '__main__':
 
             query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(adayago)),
                          max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(adayago+60*10)),
+                         has_geo=1,
                         sort='date-posted-asc',
                         )
 

@@ -2,7 +2,9 @@ import sys
 import time
 import json
 
-from flickr_helper import GetPhotoAndMetaData, WritePhotoAndMetaToS3, GetColorClusteringMetadataFromJPG
+from _configuration import S3_BUCKET
+
+from flickr_helper import GetPhotoAndMetaData, WritePhotoAndMetaToS3, CheckIfDownloadedAndPreprocessed
 
 ######################################################
 # CQL ROCKS
@@ -11,18 +13,22 @@ from cqlengine.models import Model
 from cqlengine import connection
 
 # Define a model
-class flickrmetaplus(Model):
-    collection = columns.Text(primary_key=True)
-    photoid = columns.Text(primary_key=True)
-    metaplusjson = columns.Text()
-    def __repr__(self):
-        return '<sourceoftruth: collection=%s photoid=%s>' % (self.collection, self.photoid)
+# class flickrmetaplus(Model):
+#     collection = columns.Text(primary_key=True)
+#     photoid = columns.Text(primary_key=True)
+#     metaplusjson = columns.Text()
+#     def __repr__(self):
+#         return '<sourceoftruth: collection=%s photoid=%s>' % (self.collection, self.photoid)
 
-connection.setup(['127.0.0.1'], "inlivingcolor")
+# connection.setup(['127.0.0.1'], "inlivingcolor")
 
-from cqlengine.management import sync_table
-sync_table(flickrmetaplus)
+# from cqlengine.management import sync_table
+# sync_table(flickrmetaplus)
 
+
+# import boto
+# conn = boto.connect_s3()
+# bucket = conn.get_bucket(S3_BUCKET)
 
 
 
@@ -32,11 +38,14 @@ def DownloadPreprocessAndStore(jsoninput):
     photoid = json.loads(jsoninput)['photoid']  # 4='value'
 
     # TODO, replace this checking with checking S3, the source of truth after all
-    if flickrmetaplus.objects(collection=collection,
-                         photoid=photoid).count() > 0:
+    # if flickrmetaplus.objects(collection=collection,
+    #                      photoid=photoid).count() > 0:
+    #     print "Already downloaded %s/%s" % (collection, photoid)
+    #     return
+
+    if CheckIfDownloadedAndPreprocessed(collection, photoid) is not True:
         print "Already downloaded %s/%s" % (collection, photoid)
         return
-
 
 # bucket.get_key(os.path.join(collection, binstr, photoid, 'DOWNLOAD_AND_WRITE_SUCCEEDED'))
 # get_key()
@@ -56,14 +65,14 @@ def DownloadPreprocessAndStore(jsoninput):
     # print collection, photoid, photoandmetadict['ImageJPG'][:10]
     # TODO: add more checks here, see if the data we need is here
 
-    forcassandra = dict(
-            collection=collection,
-            photoid=photoid,
-            metaplusjson=metaplusjson,
-            )
-    flickrmetaplus.create(**forcassandra)
+    # forcassandra = dict(
+    #         collection=collection,
+    #         photoid=photoid,
+    #         metaplusjson=metaplusjson,
+    #         )
+    # flickrmetaplus.create(**forcassandra)
 
-    print "Sent to Cassandra %s/%s" % (collection, photoid)
+    # print "Sent to Cassandra %s/%s" % (collection, photoid)
 
     WritePhotoAndMetaToS3(collection,
                           photoid,
@@ -71,7 +80,7 @@ def DownloadPreprocessAndStore(jsoninput):
                           metaplusjson
                           )
 
-    print "Copied to S3 to Cassandra %s/%s" % (collection, photoid)
+    print "Copied to S3 %s/%s" % (collection, photoid)
 
 
 if __name__ == '__main__':
