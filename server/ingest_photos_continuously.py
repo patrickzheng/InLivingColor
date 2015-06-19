@@ -9,19 +9,21 @@ if __name__ == '__main__':
     print "collection: ", collection
 
     now = int(time.time())
-    adayago = now - 24*3600
+
+    initialdelay = 24*3600*30
+    mindelay = 24*3600
+    querytime = now - initialdelay - 60*5
     while True:
 
         # now = int(time.time())
         # timeelapsesincelastca
 
         try:
-            now = time.time()
-            adayago = now - 24*3600
+            # querytime = min(now - mindelay, querytime + 60*5)
 
 
-            query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(adayago)),
-                         max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(adayago+60*10)),
+            query = dict(min_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(querytime)),
+                         max_upload_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(querytime+60*10)),
                          has_geo=1,
                         sort='date-posted-asc',
                         )
@@ -31,8 +33,15 @@ if __name__ == '__main__':
             timeelapsed = int(time.time()) - now
             print "TIMEELAPSED (should be less than 5 mins): %d"%timeelapsed
 
-            sleepfor = max(0,timeelapsed-60*5)
-            print "Slept for %d seconds"%sleepfor
+            querytime += 60*5
+
+            print 'waiting .',
+            while querytime > time.time() - mindelay:
+                print '.',
+                time.sleep(5)
+            print ''
+            # sleepfor = max(0,timeelapsed-60*5)
+            # print "Slept for %d seconds"%sleepfor
         except KeyboardInterrupt:
             raise
         except:
