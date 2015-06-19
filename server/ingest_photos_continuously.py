@@ -28,6 +28,8 @@ if __name__ == '__main__':
                         sort='date-posted-asc',
                         )
 
+            print 'downloading', query['min_upload_date']
+
             QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=0.05)
 
             timeelapsed = int(time.time()) - now

@@ -6,7 +6,7 @@ from _configuration import S3_BUCKET
 
 from flickr_helper import GetPhotoAndMetaData
 from flickr_helper import WritePhotoAndMetaToS3
-from flickr_helper import CheckIfDownloadedAndPreprocessed
+from flickr_helper import AlreadyDownloadedAndPreprocessed
 from flickr_helper import GetColorClusteringMetadataFromJPG
 
 
@@ -47,7 +47,7 @@ def DownloadPreprocessAndStore(jsoninput):
     #     print "Already downloaded %s/%s" % (collection, photoid)
     #     return
 
-    if CheckIfDownloadedAndPreprocessed(collection, photoid) is not True:
+    if AlreadyDownloadedAndPreprocessed(collection, photoid) is True:
         print "Already downloaded %s/%s" % (collection, photoid)
         return
 
