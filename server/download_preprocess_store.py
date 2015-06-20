@@ -34,6 +34,36 @@ from cqlengine import connection
 # conn = boto.connect_s3()
 # bucket = conn.get_bucket(S3_BUCKET)
 
+def MakeThumbnail(jpgdata):
+    import PIL
+    from PIL import Image
+
+    import StringIO
+
+    buff = StringIO.StringIO()
+    buff.write(jpgdata)
+    buff.seek(0)
+    Image.open(buff)
+    buff.close()
+
+    basewidth = 300
+    img = Image.open('flower.jpg')
+    wpercent = (basewidth / float(img.size[0]))
+    hsize = int((float(img.size[1]) * float(wpercent)))
+    imgobj = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+    # print np.asarray(img)
+    # img = np.asarray(img)
+    # plt.imshow(img)
+
+
+    buff = StringIO.StringIO()
+    imgobj.save(buff)
+    # buff.write(imgobj)
+    buff.seek(0)
+    output = buff.read()
+    buff.close()
+
+    return output, basewidth, hsize
 
 
 def DownloadPreprocessAndStore(jsoninput):
@@ -47,20 +77,29 @@ def DownloadPreprocessAndStore(jsoninput):
     #     print "Already downloaded %s/%s" % (collection, photoid)
     #     return
 
-    if AlreadyDownloadedAndPreprocessed(collection, photoid) is True:
-        print "Already downloaded %s/%s" % (collection, photoid)
-        return
+    for i in range(3):
+      secret = time.strftime("%Y-%m-%d_%H",time.gmtime(time.time()-3600*i))
+
+      if AlreadyDownloadedAndPreprocessed(collection, photoid, secret) is True:
+          print "Already downloaded %s/%s" % (collection, photoid)
+          return
 
 # bucket.get_key(os.path.join(collection, binstr, photoid, 'DOWNLOAD_AND_WRITE_SUCCEEDED'))
 # get_key()
     photoandmetadict = GetPhotoAndMetaData(photoid)
 
-    clusters = GetColorClusteringMetadataFromJPG(photoandmetadict['imagejpg'])
+    secret = time.strftime("%Y-%m-%d_%H", time.gmtime(time.time()))
+
+    jpgthumbdata, thumbw, thumbh = MakeThumbnail(photoandmetadict['imagejpg'])
+
+    clusters = GetColorClusteringMetadataFromJPG(jpgthumbdata)
     infodict = json.loads(photoandmetadict['infojson'])['photo']
     exifdict = json.loads(photoandmetadict['exifjson'])['photo']
     metaplusjson = json.dumps(dict(collection=collection,
                                    photoid=photoid,
-                                   secret=(int(photoid)*13) % 100,
+                                   thumbw=thumbw,
+                                   thumbh=thumbh,
+                                   secret=secret,
                                    clusters=clusters,
                                    info=infodict,
                                    exif=exifdict,
@@ -81,7 +120,9 @@ def DownloadPreprocessAndStore(jsoninput):
     WritePhotoAndMetaToS3(collection,
                           photoid,
                           photoandmetadict['imagejpg'],
-                          metaplusjson
+                          jpgthumbdata,
+                          metaplusjson,
+                          secret
                           )
 
     print "Copied to S3 %s/%s" % (collection, photoid)

@@ -194,7 +194,7 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
             f.write(jpgdata)
             img=mpimg.imread(f.name)
 
-        imgflat = img.reshape(-1,3)[::50]/256.0
+        imgflat = img.reshape(-1, 3)[::3]/256.0
 #         imgflat = img.reshape(-1,3)[::50]/256.0*0+0.5+np.random.randn(imgflat.shape[0],img.shape[2])*0.0001
 
         output = {}
@@ -219,25 +219,24 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
         return 'None'
 
 
-def AlreadyDownloadedAndPreprocessed(collection, photoid):
-    binstrs = [time.strftime("%Y-%m-%d",time.gmtime(time.time()-24*3600*i)) for i in range(2)]
-
-    keynames = [os.path.join(collection, b, photoid,
-                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED') for b in binstrs]
-
-    keys = [bucket.get_key(keyname) for keyname in keynames]
-
-    for key in keys:
-        if key is not None:
-            return True
-
-    return False
+def AlreadyDownloadedAndPreprocessed(collection, photoid, secret):
+    # change to something else, like cassandra
 
 
-def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
+    keyname =os.path.join(collection, secret, photoid,
+                          'DOWNLOAD_AND_PREPROCESS_SUCCEEDED')
 
-    import time
-    binstr = time.strftime("%Y-%m-%d", time.gmtime(time.time()))
+    key = bucket.get_key(keyname)
+
+    if key is not None:
+        return True
+    else:
+        return False
+
+
+def WritePhotoAndMetaToS3(collection, photoid, jpgdata, jpgthumbdata, metaplusjson, secret):
+    import matplotlib.image as mpimg
+
 
     # print os.path.join(collection, photoid, filename)
 
@@ -246,15 +245,19 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
     #     k = bucket.new_key(os.path.join(collection, photoid, 'image.jpg'))
     #     k.set_contents_from_filename(f.name)
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'image.jpg'))
+    k = bucket.new_key(os.path.join(collection, secret, photoid, 'image.jpg'))
     k.set_contents_from_string(jpgdata)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid, 'metaplus.json'))
+    k = bucket.new_key(os.path.join(collection, 'thumbs', photoid + '.jpg'))
+    k.set_contents_from_string(jpgthumbdata)
+    k.make_public()
+
+    k = bucket.new_key(os.path.join(collection, secret, photoid, 'metaplus.json'))
     k.set_contents_from_string(metaplusjson)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, binstr, photoid,
+    k = bucket.new_key(os.path.join(collection, secret, photoid,
                        'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
     k.set_contents_from_string("")
 
@@ -262,79 +265,8 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
     #                    'NEW'))
     k.set_contents_from_string("")
 
-    return binstr
-    # k.make_public()
 
 
-
-
-def WritePhotoToS3(path='', photoid=None):
-
-    # import urllib2
-
-    tempdir = tempfile.mkdtemp()
-    # print tempdir
-    WriteFiles(path=tempdir, photoid=photoid)
-
-    filenames = ['info.json', 'exif.json', 'image.jpg']
-
-    for filename in filenames:
-
-        k = bucket.new_key(os.path.join(path, filename))
-        k.set_contents_from_string(os.path.join(tempdir, filename))
-
-    shutil.rmtree(tempdir)
-    # import urllib2
-    # import contextlib
-
-    # search_query = photoid2url(photoid)
-
-    # with contextlib.closing(urllib.urlopen(search_query)) as x:
-    #    ...use x at will here...
-    # try:
-
-    #     sf = urllib2.urlopen(search_query)
-    #     search_soup = BeautifulSoup.BeautifulStoneSoup(sf.read())
-    # except urllib2.URLError, err:
-    #     print(err.reason)
-    # finally:
-    #     try:
-    #         sf.close()
-    #     except NameError:
-    #         pass
-
-    # path = os.path.join(path,)
-    # Create folder in S3
-    # print os.path.join(path)+'/'
-    # k = bucket.new_key(os.path.join(path)+'/')
-
-    # # mkdir_p(path)
-
-    # # wget.download(photoid2url(photoid), out=os.path.join(path, 'Image.jpg'))
-    # urllib.urlretrieve(photoid2url(photoid), os.path.join(path, 'Image.jpg'))
-
-
-    # # Write getInfo information to S3
-    # resp_str = flickr.photos.getInfo(photo_id=photoid, format="json")
-    # k = bucket.new_key(os.path.join(path, 'Info.json'))
-    # k.set_contents_from_string(resp_str)
-
-    # # Write getExif information to S3
-    # resp_str = flickr.photos.getExif(photo_id=photoid, format="json")
-    # k = bucket.new_key(os.path.join(path, 'Info.json'))
-    # k.set_contents_from_string(resp_str)
-
-
-
-    # with open(os.path.join(path, 'Info.json'), 'w+') as f:
-    #     f.write(InfoJSON)
-
-    # with open(os.path.join(path, 'Exif.json'), 'w+') as f:
-    #     f.write(ExifJSON)
-
-
-
-# def WriteFiles_AppendTimeStamp(path='', photoid=None):
 
 
 def photoid2getInfoResponse(photoid):

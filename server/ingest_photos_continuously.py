@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     initialdelay = 24*3600*31
     mindelay = 24*3600
-    interval = -20*60
+    interval = 20*60
     querytime = now - initialdelay - interval
     while True:
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
             print 'downloading', query['min_upload_date']
 
-            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=0.01)
+            QueueIngestionByFlickrAPISearchQuery(collection=collection, query=query, delay=0.03)
 
             timeelapsed = int(time.time()) - now
             print "TIMEELAPSED (should be less than 5 mins): %d"%timeelapsed
