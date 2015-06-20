@@ -205,6 +205,10 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
 
             labelsums = np.array(map(lambda i: sum(labels==i),range(numberofcolors)))
             labelprobs = 1.0*labelsums / sum(labelsums)
+
+            labelprobs, centroids = zip(*sorted(zip(labelprobs,centroids), reverse=True))
+
+
             output[numberofcolors] = dict(centroids={i+1:tuple(centroids[i]) for i in range(numberofcolors)},
                                                     probs={i+1:labelprobs[i] for i in range(numberofcolors)})
 
@@ -216,20 +220,24 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
 
 
 def AlreadyDownloadedAndPreprocessed(collection, photoid):
-    binstr = "%02d" % ((int(photoid)*13) % 100)
+    binstrs = [time.strftime("%Y-%m-%d",time.gmtime(time.time()-24*3600*i)) for i in range(2)]
 
-    keyname = os.path.join(collection, binstr, photoid,
-                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED')
+    keynames = [os.path.join(collection, b, photoid,
+                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED') for b in binstrs]
 
-    if bucket.get_key(keyname) is None:
-        return False
-    else:
-        return True
+    keys = [bucket.get_key(keyname) for keyname in keynames]
+
+    for key in keys:
+        if key is not None:
+            return True
+
+    return False
 
 
 def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
 
-    binstr = "%02d" % ((int(photoid)*13) % 100)
+    import time
+    binstr = time.strftime("%Y-%m-%d", time.gmtime(time.time()))
 
     # print os.path.join(collection, photoid, filename)
 
@@ -254,6 +262,7 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson):
     #                    'NEW'))
     k.set_contents_from_string("")
 
+    return binstr
     # k.make_public()
 
 
