@@ -63,7 +63,7 @@ def MakeThumbnail(jpgdata):
 
 
 def DownloadPreprocessAndStore(jsoninput):
-
+    import base64
     collection = json.loads(jsoninput)['collection']  # 4='value'
     photoid = json.loads(jsoninput)['photoid']  # 4='value'
 
@@ -95,6 +95,7 @@ def DownloadPreprocessAndStore(jsoninput):
                                    photoid=photoid,
                                    thumbw=thumbw,
                                    thumbh=thumbh,
+                                   thumbjpgbase64=base64.b64encode(jpgthumbdata),
                                    secret=secret,
                                    clusters=clusters,
                                    info=infodict,
