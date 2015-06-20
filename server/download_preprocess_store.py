@@ -87,6 +87,9 @@ def DownloadPreprocessAndStore(jsoninput):
     print "Copied to S3 %s/%s" % (collection, photoid)
 
 
+    # sent by netstat
+
+
 if __name__ == '__main__':
 
 

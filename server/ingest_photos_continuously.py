@@ -9,9 +9,9 @@ if __name__ == '__main__':
 
     now = int(time.time())
 
-    initialdelay = 24*3600*30
+    initialdelay = 24*3600*31
     mindelay = 24*3600
-    interval = -10*60
+    interval = -20*60
     querytime = now - initialdelay - interval
     while True:
 
