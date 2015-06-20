@@ -249,6 +249,10 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, jpgthumbdata, metaplusjs
     k.set_contents_from_string(jpgdata)
     k.make_public()
 
+    k = bucket.new_key(os.path.join(collection, secret, photoid, 'image_thumb.jpg'))
+    k.set_contents_from_string(jpgthumbdata)
+    k.make_public()
+
     k = bucket.new_key(os.path.join(collection, 'thumbs', photoid + '.jpg'))
     k.set_contents_from_string(jpgthumbdata)
     k.make_public()

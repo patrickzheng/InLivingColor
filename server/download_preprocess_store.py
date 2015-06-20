@@ -43,22 +43,18 @@ def MakeThumbnail(jpgdata):
     buff = StringIO.StringIO()
     buff.write(jpgdata)
     buff.seek(0)
-    Image.open(buff)
-    buff.close()
+    img = Image.open(buff)
 
     basewidth = 300
-    img = Image.open('flower.jpg')
     wpercent = (basewidth / float(img.size[0]))
     hsize = int((float(img.size[1]) * float(wpercent)))
-    imgobj = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
-    # print np.asarray(img)
-    # img = np.asarray(img)
-    # plt.imshow(img)
+    img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+    buff.close()
 
 
     buff = StringIO.StringIO()
-    imgobj.save(buff)
-    # buff.write(imgobj)
+    img.save(buff, format='JPEG')
+    # buff.write(img)
     buff.seek(0)
     output = buff.read()
     buff.close()
@@ -146,14 +142,15 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                # DownloadPreprocessAndStore(buff[:-1])
-                try:
-                    DownloadPreprocessAndStore(buff[:-1])
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    print 'Error processing msg: ', buff[:-1]
-                    pass
+                DownloadPreprocessAndStore(buff[:-1])
+
+                # try:
+                #     DownloadPreprocessAndStore(buff[:-1])
+                # except KeyboardInterrupt:
+                #     raise
+                # except:
+                #     print 'Error processing msg: ', buff[:-1]
+                #     pass
                 buff = ''
                 k = k + 1
 
