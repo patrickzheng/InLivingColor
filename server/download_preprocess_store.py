@@ -130,15 +130,15 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                DownloadPreprocessAndStore(buff[:-1])
+                # DownloadPreprocessAndStore(buff[:-1])
 
-                # try:
-                #     DownloadPreprocessAndStore(buff[:-1])
-                # except KeyboardInterrupt:
-                #     raise
-                # except:
-                #     print 'Error processing msg: ', buff[:-1]
-                #     pass
+                try:
+                    DownloadPreprocessAndStore(buff[:-1])
+                except KeyboardInterrupt:
+                    raise
+                except:
+                    print 'Error processing msg: ', buff[:-1]
+                    pass
                 buff = ''
                 k = k + 1
 
