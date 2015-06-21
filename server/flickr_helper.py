@@ -219,12 +219,11 @@ def GetColorClusteringMetadataFromJPG(jpgdata, ks=range(1,8), return_type='dict'
         return 'None'
 
 
-def AlreadyDownloadedAndPreprocessed(collection, photoid, secret):
+def AlreadyDownloadedAndPreprocessed(collection, photoid):
     # change to something else, like cassandra
 
-
-    keyname =os.path.join(collection, secret, photoid,
-                          'DOWNLOAD_AND_PREPROCESS_SUCCEEDED')
+    keyname = os.path.join(collection, '_alreadydownloadedphotoids' , photoid,
+                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED')
 
     key = bucket.get_key(keyname)
 
@@ -234,7 +233,7 @@ def AlreadyDownloadedAndPreprocessed(collection, photoid, secret):
         return False
 
 
-def WritePhotoAndMetaToS3(collection, photoid, jpgdata, jpgthumbdata, metaplusjson, secret):
+def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson, datebin):
     import matplotlib.image as mpimg
 
 
@@ -245,23 +244,27 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, jpgthumbdata, metaplusjs
     #     k = bucket.new_key(os.path.join(collection, photoid, 'image.jpg'))
     #     k.set_contents_from_filename(f.name)
 
-    k = bucket.new_key(os.path.join(collection, secret, photoid, 'image.jpg'))
+    # k = bucket.new_key(os.path.join(collection, datebin, photoid, 'image.jpg'))
+    # k.set_contents_from_string(jpgdata)
+    # k.make_public()
+
+    k = bucket.new_key(os.path.join(collection, datebin, photoid + '.jpg'))
     k.set_contents_from_string(jpgdata)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, secret, photoid, 'image_thumb.jpg'))
-    k.set_contents_from_string(jpgthumbdata)
-    k.make_public()
-
     k = bucket.new_key(os.path.join(collection, 'thumbs', photoid + '.jpg'))
-    k.set_contents_from_string(jpgthumbdata)
+    k.set_contents_from_string(jpgdata)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, secret, photoid, 'metaplus.json'))
+    k = bucket.new_key(os.path.join(collection, datebin, photoid + '-metaplus.json'))
     k.set_contents_from_string(metaplusjson)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, secret, photoid,
+    k = bucket.new_key(os.path.join(collection, datebin, photoid,
+                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
+    k.set_contents_from_string("")
+
+    k = bucket.new_key(os.path.join(collection, '_alreadydownloadedphotoids' , photoid,
                        'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
     k.set_contents_from_string("")
 
@@ -341,7 +344,7 @@ def photoid2url(photoid):
     p = flickr.photos.getInfo(photo_id=photoid)[0]
     return photo2url(p)
 
-def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):
+def photo2url(photo, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s_n.jpg"):
     return urlformat % photo.attrib
 
 # def photo2url(photoid, urlformat="https://farm%(farm)s.staticflickr.com/%(server)s/%(id)s_%(secret)s.jpg"):

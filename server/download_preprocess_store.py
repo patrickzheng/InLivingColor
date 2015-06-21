@@ -45,21 +45,25 @@ def MakeThumbnail(jpgdata):
     buff.seek(0)
     img = Image.open(buff)
 
-    basewidth = 300
-    wpercent = (basewidth / float(img.size[0]))
-    hsize = int((float(img.size[1]) * float(wpercent)))
-    img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+
+    w = img.size[0]
+    h = img.size[1]
+    # basewidth = 300
+    # wpercent = (basewidth / float(img.size[0]))
+    # hsize = int((float(img.size[1]) * float(wpercent)))
+    # img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
     buff.close()
 
 
-    buff = StringIO.StringIO()
-    img.save(buff, format='JPEG')
-    # buff.write(img)
-    buff.seek(0)
-    output = buff.read()
-    buff.close()
+    # buff = StringIO.StringIO()
+    # img.save(buff, format='JPEG')
+    # # buff.write(img)
+    # buff.seek(0)
+    # output = buff.read()
+    # buff.close()
 
-    return output, basewidth, hsize
+    # return output, basewidth, hsize
+    return jpgdata, w, h
 
 
 def DownloadPreprocessAndStore(jsoninput):
@@ -73,12 +77,9 @@ def DownloadPreprocessAndStore(jsoninput):
     #     print "Already downloaded %s/%s" % (collection, photoid)
     #     return
 
-    for i in range(3):
-      secret = time.strftime("%Y-%m-%d_%H",time.gmtime(time.time()-3600*i))
-
-      if AlreadyDownloadedAndPreprocessed(collection, photoid, secret) is True:
-          print "Already downloaded %s/%s" % (collection, photoid)
-          return
+    if AlreadyDownloadedAndPreprocessed(collection, photoid) is True:
+        print "Already downloaded %s/%s" % (collection, photoid)
+        return
 
 # bucket.get_key(os.path.join(collection, binstr, photoid, 'DOWNLOAD_AND_WRITE_SUCCEEDED'))
 # get_key()
@@ -102,22 +103,9 @@ def DownloadPreprocessAndStore(jsoninput):
                                    exif=exifdict,
                                    ))
 
-    # print collection, photoid, photoandmetadict['ImageJPG'][:10]
-    # TODO: add more checks here, see if the data we need is here
-
-    # forcassandra = dict(
-    #         collection=collection,
-    #         photoid=photoid,
-    #         metaplusjson=metaplusjson,
-    #         )
-    # flickrmetaplus.create(**forcassandra)
-
-    # print "Sent to Cassandra %s/%s" % (collection, photoid)
-
     WritePhotoAndMetaToS3(collection,
                           photoid,
                           photoandmetadict['imagejpg'],
-                          jpgthumbdata,
                           metaplusjson,
                           secret
                           )
@@ -125,7 +113,6 @@ def DownloadPreprocessAndStore(jsoninput):
     print "Copied to S3 %s/%s" % (collection, photoid)
 
 
-    # sent by netstat
 
 
 if __name__ == '__main__':
@@ -143,15 +130,15 @@ if __name__ == '__main__':
             buff += sys.stdin.read(1)
             if buff.endswith('\n'):
 
-                # DownloadPreprocessAndStore(buff[:-1])
+                DownloadPreprocessAndStore(buff[:-1])
 
-                try:
-                    DownloadPreprocessAndStore(buff[:-1])
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    print 'Error processing msg: ', buff[:-1]
-                    pass
+                # try:
+                #     DownloadPreprocessAndStore(buff[:-1])
+                # except KeyboardInterrupt:
+                #     raise
+                # except:
+                #     print 'Error processing msg: ', buff[:-1]
+                #     pass
                 buff = ''
                 k = k + 1
 
