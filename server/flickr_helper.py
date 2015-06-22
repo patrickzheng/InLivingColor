@@ -234,7 +234,7 @@ def AlreadyDownloadedAndPreprocessed(collection, photoid):
 
 
 def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson, datebin):
-    import matplotlib.image as mpimg
+    # import matplotlib.image as mpimg
 
 
     # print os.path.join(collection, photoid, filename)
@@ -260,8 +260,8 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson, datebin):
     k.set_contents_from_string(metaplusjson)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, datebin, photoid,
-                       'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
+    k = bucket.new_key(os.path.join(collection, datebin, photoid +
+                       '_DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
     k.set_contents_from_string("")
 
     k = bucket.new_key(os.path.join(collection, '_alreadydownloadedphotoids' , photoid,

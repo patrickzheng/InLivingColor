@@ -1,2 +1,1 @@
 group.id=theonlygroup
-zookeeper.connect=localhost:2181
