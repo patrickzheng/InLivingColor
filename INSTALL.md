@@ -2,35 +2,77 @@ Install
 =======
 
 
+1. Install CDH (http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cm_ig_install_path_a.html).
+
+For Ubuntu: wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+
+Make sure you install Kafka
+
+When it is installed, go to the HDFS sessions and disable "Check HDFS" permissions.
+
+Restart cluster
 
 
-    4  wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
-    5  chmod u+x cloudera-manager-installer.bin
-    6  sudo ./cloudera-manager-installer.bin
+2. Install Anaconda
+
+wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.2.0-Linux-x86_64.sh
+
+sudo ln -fs /home/ubuntu/anaconda/bin/python /usr/bin/python
+sudo ln -fs /home/ubuntu/anaconda/bin/ipython /usr/bin/ipython
+sudo ln -fs /home/ubuntu/anaconda/bin/pip /usr/bin/pip
+
+
+3. Install a bunch of stuff
+sudo apt-get update
+sudo apt-get -y install git gcc
+
+
+4. Python install
+
+sudo pip install blist cqlengine wget kafka-python flickrapi
+
+5. setup iPython
+
+
+ipython profile create default
+
+# Configuration file for ipython-notebook.
+
+c = get_config()
+
+c.NotebookApp.ip = '*'
+c.NotebookApp.open_browser = False
+c.NotebookApp.port = 8880
+
+PWDFILE='/home/ubuntu/.ipython/profile_default/nbpasswd.txt'
+c.NotebookApp.password = open(PWDFILE).read().strip()
+
+
+python -c 'from IPython.lib import passwd; print passwd()' > ~/.ipython/profile_default/nbpasswd.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    19  sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
-
-sudo apt-get install git
-
-
-sudo apt-get install python-setuptools
-#easy_install pip, don't use apt-get
-sudo easy_install pip
-
-
-git clone https://github.com/mumrah/kafka-python
-sudo pip install ./kafka-python
-
-
-
-
-
-
-add to parcel repository list
-http://archive-primary.cloudera.com/kafka/parcels/latest/
-or just download to/opt/cloudera/parcel-repo$
 
 
 #I GOT IT!!!
