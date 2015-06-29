@@ -24,12 +24,13 @@ sudo ln -fs /home/ubuntu/anaconda/bin/pip /usr/bin/pip
 
 3. Install a bunch of stuff
 sudo apt-get update
-sudo apt-get -y install git gcc
+sudo apt-get -y install git gcc maven
+sudo apt-get install openjdk-7-jdk
 
 
 4. Python install
 
-sudo pip install blist cqlengine wget kafka-python flickrapi
+sudo pip install blist cqlengine wget kafka-python flickrapi snakebite
 
 5. setup iPython
 
@@ -53,6 +54,21 @@ python -c 'from IPython.lib import passwd; print passwd()' > ~/.ipython/profile_
 
 
 
+6 Get cassandra
+
+https://sites.google.com/a/insightdatascience.com/dataengineering/devsetups/cassandra-dev
+
+git cleon https://github.com/Stratio/cassandra-lucene-index
+
+
+mvn clean -Dmaven.test.skip=true  package  -Ppatch -Dcassandra_home=/usr/local/cassandra/
+
+cassandra
+
+7 create keyspace
+
+
+cqlsh> create KEYSPACE  inlivingcolor with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };
 
 
 
@@ -60,9 +76,7 @@ python -c 'from IPython.lib import passwd; print passwd()' > ~/.ipython/profile_
 
 
 
-
-
-
+8. echo .profile to put in your data
 
 
 
@@ -101,7 +115,6 @@ sudo pip install blist
 
 
 
-Install Parlsey
 
 git clone
 https://github.com/Parsely/pyspark-cassandra
@@ -110,22 +123,6 @@ mvn clean package
 
 
 ------------------------------
-
-
-for pyspark
-28
-down vote
-accepted
-I solved this problem temporary by disabling the dfs permission.By adding below property code to conf/hdfs-site.xml
-
-  <property>
-    <name>dfs.permissions</name>
-    <value>false</value>
-  </property>
-
-
-You should do this in the CDH console
-
 
 
 run each time you reboot

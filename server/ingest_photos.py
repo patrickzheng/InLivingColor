@@ -14,7 +14,7 @@ from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter, GetInfoAsJson
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
 
-KAFKA_BROKER_LIST = 'ip-172-31-6-188:9092'
+KAFKA_BROKER_LIST = 'localhost:9092'
 
 producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 
