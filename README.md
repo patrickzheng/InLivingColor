@@ -3,7 +3,7 @@
 [http://The.InLivingColor.website](http://The.InLivingColor.website)
 
 InLivingColor is a data platform for exploring and analyzing the colors of
-the world around by using unsupervised machine learning algorithms.
+the world around by the use of unsupervised machine learning.
 It is completely open-source and uses the following technologies:
 
 - Apache Kafka
@@ -25,9 +25,29 @@ InLivingColor.website is currently downloading (as of June 29, 2015) and analyzi
 
 ![](https://github.com/rhymeswithlion/InLivingColor/blob/master/images/colorsearch.png?raw=true)
 
-- _ColorMap_: Currently shows the number of photos that have been processed in different counties of the United States.
+- _ColorMap_: Currently shows the number of photos that have been processed in different counties of the United States. (As you can see in the images above, the website is not just indexing the U.S., however.)
 
 ![](https://github.com/rhymeswithlion/InLivingColor/blob/master/images/colormap.png?raw=true)
+
+## InLivingColor InANutshell
+
+Under Construction.
+
+
+
+## How to Download Millions of Photos from Flickr
+
+Under Construction.
+
+
+## Batch Processing
+
+Under Construction.
+
+
+## API Calls
+
+Under Construction.
 
 
 
