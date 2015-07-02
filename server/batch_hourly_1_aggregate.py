@@ -1,8 +1,6 @@
 
 # coding: utf-8
 
-# History Server: http://52.8.132.94:18088/
-
 # # Load Spark
 
 # In[1]:
@@ -16,10 +14,12 @@ if not spark_home:
 sys.path.insert(0, os.path.join(spark_home, 'python'))
 sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
 
+os.environ['PYSPARK_SUBMIT_ARGS']="--num-executors 10 --master yarn --deploy-mode client --executor-memory 1500m --driver-memory 1500m"
+
 execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
 
 
-# In[6]:
+# In[ ]:
 
 from _configuration import *
 
@@ -39,49 +39,54 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
     print ''
     print 'Initial Scan:'
 
-    datetimebin = firstdatetimebin
+    datetimebin = firstdatetimebin + 3600*80
+    
 
-    while datetimebin < time.time():
-        datetimebin += 3600
+    while datetimebin < time.time() - 3600:
+
         datetimebinstr = time.strftime('%Y-%m-%d_%H', time.gmtime(datetimebin))
-
+        datetimebin += 3600
+        
+#         print time.time(), datetimebin
+        
         key = bucket.get_key('%s/metaplus_%s.json/_SUCCESS'%(collection,datetimebinstr))
 
-        if key is None:
+        # If YYYY-MM-DD_HH.p has already been generated, no need to do it again.
+        if key is not None:
+            print '--- File %s already exists. Skipping...' % (datetimebinstr+'.json')
+            continue
 
-            print datetimebinstr, ': Might need to aggregate'
-
-            if dry_run is True:
-                continue
-
-            try:
-                # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json
-                a = sc.textFile(os.path.join(S3_PREFIX,datetimebinstr,'*metaplus.json'))
-                # This will throw an exception if there is no file
-                a.first()
+        print datetimebinstr, ': Might need to aggregate'
+        
 
 
+        # Delete files that might prevent us from writing
+        filestodelete = list(bucket.list(os.path.join(collection,'metaplus_%s.json'%(datetimebinstr))))
+        if len(filestodelete) > 0:
+            print '--- Deleting:', filestodelete
+            bucket.delete_keys(filestodelete)
+        
+        if dry_run is True:
+            continue
+
+        
+        # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json    
+        a = sc.textFile(os.path.join(S3_PREFIX,datetimebinstr,'*metaplus.json'))
+        # This will throw an exception if there is no file
+#         a.first()
 
 
 
-                # Coalesce into a small number of partitions so that each file piece is ~100MB
-                a = a.coalesce(30, shuffle=True)
-                a.persist()
-                numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
-                a = a.coalesce(int(numberofpartitions), shuffle=True)
 
-                get_ipython().magic(u"time a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))")
-                print "Saved to S3"
-    #             except:
-    #                 print "No individual files"
-    #                 pass
 
-            except:
-                # No files on S3 source
-                print datetimebinstr, ': --->No source files to aggregate'
+        # Coalesce into a small number of partitions so that each file piece is ~100MB
+        a = a.coalesce(30, shuffle=True)
+#         a.persist()
+#         numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
+#         a = a.coalesce(int(numberofpartitions), shuffle=True)
 
-        else:
-            print datetimebinstr, ': Already aggregated'
+        get_ipython().magic(u"time a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))")
+        print "Saved to S3"
 
 
 
@@ -94,10 +99,9 @@ time.sleep(5)
 
 # ## Take individual metaplus.json files, aggregate, and copy to S3 (for convenience) and HDFS (for speed)
 
-# In[7]:
+# In[ ]:
 
-
-print "---------------------------------------------"
+#### print "---------------------------------------------"
 print "STAGE 1: Aggregating small S3 files and copying to S3"
 
 batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=collection, dry_run=False)
@@ -106,49 +110,17 @@ batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=collection, dry_r
 
 
 
-# In[8]:
-
-
-# #######################################################
-# #  S3 Aggregate files ----> HDFS
-
-# print "---------------------------------------------"
-# print "STAGE 2: Copying Aggregated Files from S3 to HDFS"
-
-# from snakebite.client import Client
-# client = Client("52.8.132.154")
-
-# datetimebin = FIRSTBINEVER
-# while datetimebin < time.time():
-#     datetimebin += 3600
-
-#     datetimebinstr = time.strftime('%Y-%m-%d_%H', time.gmtime(datetimebin))
-
-#     # If target directory does not exist with _SUCCESS file, then make the transfer
-#     key = bucket.get_key('%s/metaplus_%s.json/_SUCCESS'%(collection,datetimebinstr))
-
-#     hdfs_aggregated_file_exists = client.test('/inlivingcolor/' + '%s/metaplus_%s.json/_SUCCESS'%(collection,datetimebinstr), exists=True)
-#     if hdfs_aggregated_file_exists is False:
-#         print datetimebinstr, ': Might need to copy  aggregated file to HDFS'
-
-#         try:
-#             a = sc.textFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%datetimebinstr))
-
-#             # This will throw an exception if there is no file
-#             a.first()
-
-#             get_ipython().magic(u"time a.saveAsTextFile(os.path.join(HDFS_PREFIX,'metaplus_%s.json'%datetimebinstr))")
-#             print "Saved aggregated file to HDFS"
-#         except:
-#             print "No source aggregated file on S3"
-#             pass
-
-
-#     else:
-#         print datetimebinstr, ': Already copied aggregated file to HDFS'
+# In[ ]:
 
 
 
+
+# In[ ]:
+
+
+
+
+# In[ ]:
 
 
 
