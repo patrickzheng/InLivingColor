@@ -12,7 +12,7 @@ tmux kill-session -t $SESSION
 tmux new-session -s $SESSION -n bash -d
 tmux send-keys -t $SESSION:$ID "$COMMAND" C-m
 
-
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 5000
 
 ################################################################################
 # IPYTHON
