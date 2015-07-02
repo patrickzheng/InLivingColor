@@ -45,15 +45,15 @@ def WriteToElasticSearch_bypartition(index, doc_type, kv_iter):
     """
     This preserves keys. Unlike elasticsearch-hadoop-2.1.0.jar .
     # print testrdd.saveAsNewAPIHadoopFile(
-    #     path='-', 
+    #     path='-',
     #     outputFormatClass="org.elasticsearch.hadoop.mr.EsOutputFormat",
-    #     keyClass="org.apache.hadoop.io.NullWritable", 
-    #     valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable", 
+    #     keyClass="org.apache.hadoop.io.NullWritable",
+    #     valueClass="org.elasticsearch.hadoop.mr.LinkedMapWritable",
     #     conf={ "es.resource" : "test/test3" })
     """
     from elasticsearch import Elasticsearch
     es = Elasticsearch()
-    
+
     for kv in kv_iter:
         _id = kv[0]
         body = kv[1]
@@ -96,7 +96,7 @@ try:
     startatthistime = time.mktime(time.strptime(GetLastDownloadTimestamp(),"%Y-%m-%d_%H")) - 3600*24
 except:
     startatthistime = FIRSTBINEVER
-        
+
 
 datetimebins = map(lambda d: time.strftime('%Y-%m-%d_%H', time.gmtime(d)), range(int(startatthistime),int(time.time()),3600))
 print datetimebins
@@ -193,7 +193,7 @@ maps.append(['c5c5g',lambda d: int(d['clusters']['5']['centroids']['5'][1]*256),
 maps.append(['c5c5b',lambda d: int(d['clusters']['5']['centroids']['5'][2]*256),None])
 maps.append(['c5p5',lambda d: int(d['clusters']['5']['probs']['5']*100),None])
 
-             
+
 # Use the following to generate the above
 # for i in range(1,6):
 #     for j in range(1,i+1):
@@ -205,7 +205,7 @@ maps.append(['c5p5',lambda d: int(d['clusters']['5']['probs']['5']*100),None])
 
 def simplifyrecord(d):
     output = {}
-    
+
     for m in maps:
         try:
             output[m[0]] = m[1](d)
@@ -214,7 +214,7 @@ def simplifyrecord(d):
                 return None
             else:
                 output[m[0]] = m[2]
-    
+
     return output
 
 
@@ -236,7 +236,7 @@ def batch_movetoelasticsearch(collection=None,datetimebins=[], dry_run=True):
 
     for datetimebinstr in datetimebins:
         print datetimebinstr
-        
+
         try:
             # Load JSON files form S3 and convert to Python dict's
             rdd = sc.textFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%datetimebinstr))
@@ -246,10 +246,10 @@ def batch_movetoelasticsearch(collection=None,datetimebins=[], dry_run=True):
             rdd = rdd.map(simplifyrecord).filter(lambda d: d is not None).map(lambda d: (d['photoid'],d))
 
             # Write to ElasticSearch partition by partition
-            get_ipython().magic(u"time rdd.foreachPartition(lambda kv_iter: WriteToElasticSearch_bypartition('inlivingcolor','colorcluster',kv_iter))")
+            rdd.foreachPartition(lambda kv_iter: WriteToElasticSearch_bypartition('inlivingcolor','colorcluster',kv_iter))
         except:
             print "Error: Perhaps %s does not exist?" % ('metaplus_%s.json'%datetimebinstr)
-            
+
 
 batch_movetoelasticsearch(collection=collection,datetimebins=datetimebins[:])
 

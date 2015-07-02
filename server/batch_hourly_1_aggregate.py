@@ -40,15 +40,15 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
     print 'Initial Scan:'
 
     datetimebin = firstdatetimebin + 3600*80
-    
+
 
     while datetimebin < time.time() - 3600:
 
         datetimebinstr = time.strftime('%Y-%m-%d_%H', time.gmtime(datetimebin))
         datetimebin += 3600
-        
+
 #         print time.time(), datetimebin
-        
+
         key = bucket.get_key('%s/metaplus_%s.json/_SUCCESS'%(collection,datetimebinstr))
 
         # If YYYY-MM-DD_HH.p has already been generated, no need to do it again.
@@ -57,7 +57,7 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
             continue
 
         print datetimebinstr, ': Might need to aggregate'
-        
+
 
 
         # Delete files that might prevent us from writing
@@ -65,12 +65,12 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
         if len(filestodelete) > 0:
             print '--- Deleting:', filestodelete
             bucket.delete_keys(filestodelete)
-        
+
         if dry_run is True:
             continue
 
-        
-        # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json    
+
+        # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json
         a = sc.textFile(os.path.join(S3_PREFIX,datetimebinstr,'*metaplus.json'))
         # This will throw an exception if there is no file
 #         a.first()
@@ -85,7 +85,7 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
 #         numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
 #         a = a.coalesce(int(numberofpartitions), shuffle=True)
 
-        get_ipython().magic(u"time a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))")
+        a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))
         print "Saved to S3"
 
 

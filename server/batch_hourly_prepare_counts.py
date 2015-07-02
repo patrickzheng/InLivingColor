@@ -124,7 +124,7 @@ rdd.take(1)
 # In[8]:
 
 # For debugging
-# datetimebin = 
+# datetimebin =
 
 
 import boto
@@ -143,7 +143,7 @@ for i,datetimebin in enumerate(datetimebins):
     if bucket.get_key(os.path.join(collection,'_batchstage_counts',datetimebin+'.p','_SUCCESS')) is not None:
         print '--- File %s already exists. Skipping...' % (datetimebin+'.p')
         continue
-        
+
     # Delete files that might prevent us from writing to YYYY-MM-DD_HH.p
     filestodelete = list(bucket.list(os.path.join(collection,'_batchstage_counts',datetimebin+'.p')))
     if len(filestodelete) > 0:
@@ -279,7 +279,7 @@ for i,datetimebin in enumerate(datetimebins):
                     ))
         rdd = rdd.reduceByKey(lambda x,y: x+y)
         rdd = rdd.coalesce(1)
-        get_ipython().magic(u"time rdd.saveAsPickleFile(os.path.join(S3_PREFIX,'_batchstage_counts',datetimebin+'.p'))")
+        rdd.saveAsPickleFile(os.path.join(S3_PREFIX,'_batchstage_counts',datetimebin+'.p'))
         print '--- Successfully wrote to '+datetimebin+'.p'
     except:
         print '--- DID NOT write to '+datetimebin+'.p'
@@ -311,7 +311,7 @@ def AddToCassandra_allcountsbatch_bypartition(d_iter):
     from cqlengine.models import Model
     from cqlengine import connection
     from cqlengine.management import sync_table
-    
+
     class allcountsbatch(Model):
         granularity = columns.Text(primary_key=True)
         country = columns.Text(primary_key=True)
@@ -320,7 +320,7 @@ def AddToCassandra_allcountsbatch_bypartition(d_iter):
         locality = columns.Text(primary_key=True)
         datetaken = columns.Text(primary_key=True)
         count = columns.Integer()
-        
+
     connection.setup(['127.0.0.1'], CASSANDRA_KEYSPACE)
 
     sync_table(allcountsbatch)
