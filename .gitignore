@@ -2,6 +2,6 @@
 flickrapi_conf.py
 sftp-config.json
 *.pyc
-_configuration.py
+old
 
 *.ipynb

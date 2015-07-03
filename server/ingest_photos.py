@@ -1,11 +1,8 @@
+"""
+Helper file for ingesting photoids. Used by the "ingest_photos_continuously" scripts.
+"""
 # TODO: Make this file runnable from the command line
 
-# import argparse
-# parser = argparse.ArgumentParser()
-# parser.add_argument("--verbosity", help="increase output verbosity")
-# args = parser.parse_args()
-# if args.verbosity:
-#     print "verbosity turned on"
 
 from _configuration import KAFKA_BROKER_LIST, KAFKA_PHOTOID_TOPIC
 
@@ -14,7 +11,7 @@ from flickr_helper import GetSearchQueryAttrib, GetPhotoIDs_iter, GetInfoAsJson
 from kafka.client import KafkaClient
 from kafka.producer import KeyedProducer
 
-KAFKA_BROKER_LIST = 'localhost:9092'
+# KAFKA_BROKER_LIST = 'localhost:9092'
 
 producer = KeyedProducer(KafkaClient(KAFKA_BROKER_LIST))
 

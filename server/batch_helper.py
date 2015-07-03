@@ -1,3 +1,7 @@
+"""
+Helper functions for batch process scripts.
+"""
+
 from _configuration import CASSANDRA_KEYSPACE
 
 import time
@@ -8,7 +12,14 @@ from cqlengine import connection
 connection.setup(['127.0.0.1'], CASSANDRA_KEYSPACE)
 
 
+
+
 def timeoflastrun(name, set_to_now):
+    """
+    Allows you to figure out the last time a batch process
+    (name given by first argument) was run. Also allows you
+    to se the value to now.
+    """
     assert type(set_to_now) is bool
 
     class timeoflastruns(Model):

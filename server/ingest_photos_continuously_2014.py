@@ -1,8 +1,6 @@
 import time
 from ingest_photos import QueueIngestionByFlickrAPISearchQuery
 
-# Run like this
-# kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
 if __name__ == '__main__':
     collection = "geotagged"
     print "collection: ", collection
@@ -26,8 +24,8 @@ if __name__ == '__main__':
             query = dict(min_taken_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(querytime)),
                          max_taken_date=time.strftime("%Y-%m-%d %H:%M:%S",time.gmtime(querytime+interval)),
                          has_geo=1,
-                         tags='fields,leaves,trees,grass,hills',
-                         woe_id='2347563', # California
+                         # tags='fields,leaves,trees,grass,hills',
+                         # woe_id='2347563', # California
                          # is_commons='True',
                         sort='date-taken-asc',
                         )

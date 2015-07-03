@@ -234,23 +234,10 @@ def AlreadyDownloadedAndPreprocessed(collection, photoid):
 
 
 def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson, datebin):
-    # import matplotlib.image as mpimg
 
-
-    # print os.path.join(collection, photoid, filename)
-
-    # with tempfile.NamedTemporaryFile(delete=True) as f:
-    #     f.write(photoandmetadict['imagejpg'])
-    #     k = bucket.new_key(os.path.join(collection, photoid, 'image.jpg'))
-    #     k.set_contents_from_filename(f.name)
-
-    # k = bucket.new_key(os.path.join(collection, datebin, photoid, 'image.jpg'))
+    # k = bucket.new_key(os.path.join(collection, datebin, photoid + '.jpg'))
     # k.set_contents_from_string(jpgdata)
     # k.make_public()
-
-    k = bucket.new_key(os.path.join(collection, datebin, photoid + '.jpg'))
-    k.set_contents_from_string(jpgdata)
-    k.make_public()
 
     k = bucket.new_key(os.path.join(collection, 'thumbs', photoid + '.jpg'))
     k.set_contents_from_string(jpgdata)
@@ -260,16 +247,12 @@ def WritePhotoAndMetaToS3(collection, photoid, jpgdata, metaplusjson, datebin):
     k.set_contents_from_string(metaplusjson)
     k.make_public()
 
-    k = bucket.new_key(os.path.join(collection, datebin, photoid +
-                       '_DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
-    k.set_contents_from_string("")
+    # k = bucket.new_key(os.path.join(collection, datebin, photoid +
+    #                    '_DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
+    # k.set_contents_from_string("")
 
     k = bucket.new_key(os.path.join(collection, '_alreadydownloadedphotoids' , photoid,
                        'DOWNLOAD_AND_PREPROCESS_SUCCEEDED'))
-    k.set_contents_from_string("")
-
-    # k = bucket.new_key(os.path.join(collection, photoid,
-    #                    'NEW'))
     k.set_contents_from_string("")
 
 

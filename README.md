@@ -49,7 +49,17 @@ uses and accesses using JavaScript.
 
 ![](https://github.com/rhymeswithlion/InLivingColor/blob/master/images/ingestion.png?raw=true)
 
-InLivingColor uses a distributed system to download photographs from Flickr...
+InLivingColor uses a distributed system to download photographs from Flickr. For instance, the
+script `ingest_photos_continuously_2014.py` attempts to download as many photoid as possible
+from 2014. There are hundreds of millions of them, however, so it really attempts to download
+a uniformly-distributed portion of those photos. `ingest_photos_continuously_2014.py` then
+sends these `photoids` in a Kafka message to any number of consumers, started by the
+`d_p_s-multiservice.sh` script which allows you to run numerous processes on a single machine
+using tmux windows (i.e., `./d_p_s-multiservice.sh 5` will open up 5 of them). These
+consumers then download the JPEGs of the photos, as well as any meta data that Flickr has,
+preprocesses the photos for their color information, and then uploads these enriched JSON
+records to S3 (the images are also included in Base64 as PySpark currently does not enjoy
+accessing binary files on S3).
 
 
 ## Batch Processing
@@ -61,7 +71,3 @@ Under Construction.
 
 Under Construction.
 
-
-##
-
-Run Elasticsearch Cassanda, Flask

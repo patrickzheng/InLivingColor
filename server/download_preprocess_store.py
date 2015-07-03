@@ -35,6 +35,9 @@ from cqlengine import connection
 # bucket = conn.get_bucket(S3_BUCKET)
 
 def MakeThumbnail(jpgdata):
+    """
+    No longer needed. Now we download the thumbnails directly.
+    """
     import PIL
     from PIL import Image
 
@@ -67,6 +70,10 @@ def MakeThumbnail(jpgdata):
 
 
 def DownloadPreprocessAndStore(jsoninput):
+    """
+    Receives a JSON with a photoid and collection name, downloads it,
+    and stores it to S3.
+    """
     import base64
     collection = json.loads(jsoninput)['collection']  # 4='value'
     photoid = json.loads(jsoninput)['photoid']  # 4='value'
