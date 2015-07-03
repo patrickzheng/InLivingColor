@@ -42,6 +42,7 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
     datetimebin = firstdatetimebin + 3600*80
 
 
+    # I don't want the latest hour because it's not completely downloaded yet!
     while datetimebin < time.time() - 3600:
 
         datetimebinstr = time.strftime('%Y-%m-%d_%H', time.gmtime(datetimebin))
