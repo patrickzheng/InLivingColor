@@ -64,10 +64,27 @@ accessing binary files on S3).
 
 ## Batch Processing
 
-Under Construction.
+`batch_hourly.sh` runs all the batch processes, and although it is named "hourly" it can be
+used to rebuild all the intermediate batch steps and populate the Cassandra and Elasticsearch
+databases. Subsequently, it can be run hourly for incremental updates. Now, `batch_hourly.sh`
+calls the following:
 
+-`python batch_hourly_1_aggregate.py` aggregates the small files created by the processes
+that download, preprocess, and store the images/metadata. This is the step of the batch
+process that is the most difficult, for if the hourly download bins have many files
+this step may take several minutes. In the future it may be better to have the individual
+processes route these messages back to Kafka and use Secor to bundle them into nicely-sized
+files. The benefit of pushing the small files to S3 is that they are never queued anywhere,
+and we we take advantage of S3's excellent availablility. On the other hand, sending them
+back to Kafka would allow us to use Kafka's "Pub-Sub" capabilities to also send a real-time
+stream to SparkStreaming.
 
-## API Calls
+-`python batch_hourly_prepare_colorsearch.py` takes the aggregated files on S3, extracts the
+fields needed for the color search, saves those intermediate files back to S3, and then
+uploads the data to Elasticsearch.
 
-Under Construction.
-
+-`python batch_hourly_prepare_counts.py` takes the aggregated files on S3, runs a map-reduce
+job to perform counts at 5 levels of geographic granularity and 3 levels of temporal
+granularity (actually, the cartesian product, so 15). This is calculated for each hourly
+download bin and stored on S3. The complete reduction is then handled by incorporating all
+of these prereduced results.
