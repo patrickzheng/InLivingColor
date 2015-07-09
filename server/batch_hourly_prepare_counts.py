@@ -68,57 +68,57 @@ datetimebins = ALLBINSFROMTHISTIMETILONEHOURAGO(startprocessinghere)
 
 # In[13]:
 
-rdd = sc.textFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebins[0]))).map(lambda s: json.loads(s))
+# rdd = sc.textFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebins[0]))).map(lambda s: json.loads(s))
 
 
-# In[ ]:
+# # In[ ]:
 
-rdd = rdd.flatMap(lambda d: (
-        ######MONTHLY########
-            ((('country',LocationLevel(d, 'country')),
-                          ('region',LocationLevel(d, 'region')),
-                          ('county',LocationLevel(d, 'county')),
-                          ('locality',LocationLevel(d, 'locality')),
-                          ('datetaken',str(d['info']['dates']['taken'][:7])),
-                          ('granularity','locality/month'),
-                         ),1),
+# rdd = rdd.flatMap(lambda d: (
+#         ######MONTHLY########
+#             ((('country',LocationLevel(d, 'country')),
+#                           ('region',LocationLevel(d, 'region')),
+#                           ('county',LocationLevel(d, 'county')),
+#                           ('locality',LocationLevel(d, 'locality')),
+#                           ('datetaken',str(d['info']['dates']['taken'][:7])),
+#                           ('granularity','locality/month'),
+#                          ),1),
 
-            ((('country',LocationLevel(d, 'country')),
-                          ('region',LocationLevel(d, 'region')),
-                          ('county',LocationLevel(d, 'county')),
-                          ('locality','*'),
-                          ('datetaken',str(d['info']['dates']['taken'][:7])),
-                          ('granularity','county/month'),
-                         ),1),
+#             ((('country',LocationLevel(d, 'country')),
+#                           ('region',LocationLevel(d, 'region')),
+#                           ('county',LocationLevel(d, 'county')),
+#                           ('locality','*'),
+#                           ('datetaken',str(d['info']['dates']['taken'][:7])),
+#                           ('granularity','county/month'),
+#                          ),1),
 
-            ((('country',LocationLevel(d, 'country')),
-                          ('region',LocationLevel(d, 'region')),
-                          ('county','*'),
-                          ('locality','*'),
-                          ('datetaken',str(d['info']['dates']['taken'][:7])),
-                          ('granularity','region/month'),
-                         ),1),
+#             ((('country',LocationLevel(d, 'country')),
+#                           ('region',LocationLevel(d, 'region')),
+#                           ('county','*'),
+#                           ('locality','*'),
+#                           ('datetaken',str(d['info']['dates']['taken'][:7])),
+#                           ('granularity','region/month'),
+#                          ),1),
 
-            ((('country',LocationLevel(d, 'country')),
-                          ('region','*'),
-                          ('county','*'),
-                          ('locality','*'),
-                          ('datetaken',str(d['info']['dates']['taken'][:7])),
-                          ('granularity','country/month'),
-                         ),1),
+#             ((('country',LocationLevel(d, 'country')),
+#                           ('region','*'),
+#                           ('county','*'),
+#                           ('locality','*'),
+#                           ('datetaken',str(d['info']['dates']['taken'][:7])),
+#                           ('granularity','country/month'),
+#                          ),1),
 
-            ((('country','*'),
-                          ('region','*'),
-                          ('county','*'),
-                          ('locality','*'),
-                          ('datetaken',str(d['info']['dates']['taken'][:7])),
-                          ('granularity','all/month'),
-                         ),1),))
+#             ((('country','*'),
+#                           ('region','*'),
+#                           ('county','*'),
+#                           ('locality','*'),
+#                           ('datetaken',str(d['info']['dates']['taken'][:7])),
+#                           ('granularity','all/month'),
+#                          ),1),))
 
 
-# In[14]:
+# # In[14]:
 
-rdd.take(1)
+# rdd.take(1)
 
 
 # In[8]:
@@ -296,6 +296,9 @@ rdd = sc.pickleFile(os.path.join(S3_PREFIX,'_batchstage_counts','*'))
 # In[11]:
 
 rdd = rdd.reduceByKey(lambda x,y: x+y)
+
+# This maps ((('country','US'), ('region','TN'), ('granularity','all/all')),30123)
+# to {'country':'US', ..., 'granularity':'all/all', 'count':30123}
 rdd = rdd.map(lambda tup: dict(count=tup[1],**{item[0]:item[1] for item in tup[0]}))
 
 

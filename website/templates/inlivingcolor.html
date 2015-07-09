@@ -94,15 +94,6 @@ $(function () {
 
 
 
-    /*
-    Data parsed from http://www.bls.gov/lau/#tables
-
-    1. Go to http://www.bls.gov/lau/laucntycur14.txt (or similar, updated datasets)
-    2. In the Chrome Developer tools console, run this code:
-       copy(JSON.stringify(document.body.innerHTML.split('\n').filter(function (s) { return s.indexOf('Feb-14') !== -1; }).map(function (row) { row = row.split('|'); return { code: 'us-' + row[3].trim().slice(-2).toLowerCase() + '-' + row[2].trim(), name: row[3].trim(), value: parseFloat(row[8]) }; })))
-    3. The data is now on your clipboard, paste it below
-    */
-
     var data = {{ highmapsdata | tojson | safe }},
         countiesMap = Highcharts.geojson(Highcharts.maps['countries/us/us-all-all']),
         lines = Highcharts.geojson(Highcharts.maps['countries/us/us-all-all'], 'mapline'),
@@ -141,43 +132,27 @@ $(function () {
         },
 
         mapNavigation: {
-            enabled: true
+            enabled: false
         },
 
         colorAxis: {
             min: 0,
             max: 1000
-        //     dataClasses: [{
-        //         from: 0,
-        //         to: 2,
-        //         color: "#F1EEF6"
-        //     }, {
-        //         from: 2,
-        //         to: 4,
-        //         color: "#D4B9DA"
-        //     }, {
-        //         from: 4,
-        //         to: 6,
-        //         color: "#C994C7"
-        //     }, {
-        //         from: 6,
-        //         to: 8,
-        //         color: "#DF65B0"
-        //     }, {
-        //         from: 8,
-        //         to: 10,
-        //         color: "#DD1C77"
-        //     }, {
-        //         from: 10,
-        //         color: "#980043"
-        //     }]
         },
 
         plotOptions: {
             mapline: {
                 showInLegend: false,
                 enableMouseTracking: false
+            },
+            series: {
+                states: {
+                    hover: {
+                        enabled: false
+                    }
+                }
             }
+
         },
 
         series : [{
@@ -190,9 +165,9 @@ $(function () {
             },
             borderWidth: 0.5,
             states: {
-                hover: {
-                    color: '#bada55'
-                }
+                // hover: {
+                //     color: '#bada55'
+                // }
             }
         }, {
             type: 'mapline',
@@ -226,9 +201,9 @@ $(function () {
             a data engineering fellow at insight data science</h2>
 
             <a class="btn" url="/colorsearch/">ColorSearch</a>
-            <a class="btn" url="/colormap/">ColorMapCount</a>
-<!--             <a class="btn" url="/colortrends/">ColorTrends</a>
-            <a class="btn" url="/colorfun/">ColorFun</a>
+            <a class="btn" url="/colormap/">ColorMap</a>
+            <a class="btn" url="/colortrends/">ColorTrends</a>
+<!--             <a class="btn" url="/colorfun/">ColorFun</a>
             <a class="btn" url="/aboutinlivingcolor/">About InLivingColor</a>
             <a class="btn" url="/aboutme/">About Me</a>
  -->            <div>
@@ -250,9 +225,9 @@ $(function () {
 
     <div style="display: block" class="fixed-nav">
         <a class="fn-item" url="/colorsearch/">ColorSearch</a>
-        <a class="fn-item" url="/colormap/">ColorMapCount</a>
-<!--         <a class="fn-item" url="/colortrends/">ColorTrends</a>
-        <a class="fn-item" url="/colorfun/">ColorFun</a>
+        <a class="fn-item" url="/colormap/">ColorMap</a>
+        <a class="fn-item" url="/colortrends/">ColorTrends</a>
+<!--         <a class="fn-item" url="/colorfun/">ColorFun</a>
         <a class="fn-item" url="/aboutinlivingcolor/">About InLivingColor</a>
         <a class="fn-item" url="/aboutme/">About Me</a>
  -->    </div>
@@ -276,37 +251,20 @@ $(function () {
         <b>R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="160" data-slider-id="RC01" id="R01" data-slider-tooltip="hide" data-slider-handle="round" /><br>
         <b>G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="200" data-slider-id="GC01" id="G01" data-slider-tooltip="hide" data-slider-handle="round" /><br>
         <b>B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="20" data-slider-id="BC01" id="B01" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <!-- <b>P</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="100" data-slider-id="PC01" id="P01" data-slider-tooltip="hide" data-slider-handle="round" /> -->
         <div id="RGB01"></div>
-   </td>
-   <td>
+    </td>
+    <td>
            <b>P</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="20" data-slider-id="PC02" id="P02" data-slider-tooltip="hide" data-slider-handle="round" />
-
-<!--         <b>R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="80" data-slider-id="RC02" id="R02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="120" data-slider-id="GC02" id="G02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="20" data-slider-id="BC02" id="B02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>P</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" data-slider-id="PC02" id="P02" data-slider-tooltip="hide" data-slider-handle="round" />
-        <div id="RGB02"></div>
- -->    </td>
-   <td>
+    </td>
+    <td>
         <b>R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="80" data-slider-id="RC02" id="R02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
         <b>G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="120" data-slider-id="GC02" id="G02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
         <b>B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="20" data-slider-id="BC02" id="B02" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-<!--         <b>P</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" data-slider-id="PC02" id="P02" data-slider-tooltip="hide" data-slider-handle="round" /> -->
         <div id="RGB02"></div>
     </td>
-<!--     <td>
-
-        <b>R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="80" data-slider-id="RC03" id="R03" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="120" data-slider-id="GC03" id="G03" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="185" data-slider-step="5" data-slider-value="20" data-slider-id="BC03" id="B03" data-slider-tooltip="hide" data-slider-handle="round" /><br>
-        <b>P</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" data-slider-id="PC03" id="P03" data-slider-tooltip="hide" data-slider-handle="round" />
-        <div id="RGB03"></div>
-    </td>
- -->    </tr>
+    </tr>
 </table>
-                <div class="Collage">
-<!-- <img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/110364485.jpg" width=240 height=163><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17067163907.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963169.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17538131081.jpg" width=300 height=300><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17848432638.jpg" width=300 height=199><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16885219548.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/149490130.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15928624038.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15640086183.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16338100097.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15719581581.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/18514777192.jpg" width=240 height=171><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/60865933.jpg" width=240 height=181><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17896314504.jpg" width=240 height=150><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17268258094.jpg" width=300 height=225><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/18032616701.jpg" width=300 height=199><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17693590350.jpg" width=300 height=300><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16073766849.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16273482998.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/89608304.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17497833403.jpg" width=160 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/18119341291.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17777342699.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963834.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17845539169.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17538107531.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16541116057.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16639720852.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/48187420.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16837932700.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15723085262.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15576102419.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15727065721.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/88561169.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/35812554.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16126062954.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17538304895.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16675759843.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17227081998.jpg" width=300 height=300><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16754419946.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15276036503.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16142550518.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17130227957.jpg" width=240 height=150><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/44914005.jpg" width=240 height=173><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15709149629.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107959161.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/113593059.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963314.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107960093.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107959382.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963612.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17850298489.jpg" width=300 height=450><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/58462981.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15953757744.jpg" width=240 height=159><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107959595.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107964119.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16459436741.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15814605036.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17858369490.jpg" width=300 height=225><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17833449566.jpg" width=300 height=225><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16692166209.jpg" width=240 height=192><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/1001004944.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/43979324.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/45296744.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/64476694.jpg" width=201 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16481607624.jpg" width=240 height=150><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107958871.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107965225.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/18118298355.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17410380393.jpg" width=300 height=199><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/18009913316.jpg" width=300 height=199><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963451.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16852339830.jpg" width=211 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/107963970.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17317503015.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/17786026702.jpg" width=300 height=189><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/56811699.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/31824870.jpg" width=240 height=157><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16815373068.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16819702823.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16895949740.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16772874186.jpg" width=240 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/42154182.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/58333251.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15890451589.jpg" width=180 height=240><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/62384759.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/15094551753.jpg" width=240 height=160><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/16380115239.jpg" width=240 height=159><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/44518932.jpg" width=240 height=180><img src="https://s3-us-west-1.amazonaws.com/inlivingcolor/geotagged/thumbs/61118385.jpg" width=240 height=180> --></div>
+                <div class="Collage"></div>
             </section>
         </article>
         <div style="border-top-color: rgb(242, 239, 232); left: 6%; display: block;" class="post-after"></div>
@@ -319,7 +277,7 @@ $(function () {
 
             <header class="post-header">
 
-                <h2 class="post-title">ColorMapCount</h2>
+                <h2 class="post-title">ColorMap</h2>
 
             </header>
             <section class="post-content">
@@ -327,11 +285,29 @@ $(function () {
                     Downloading map...
                 </div>
 
+
+            <div style="width:100px; margin:0 auto;"> <!-- center this -->
+                    <input id="colorify" type="button" value="Colorify!"
+                           onclick="return colorify_onclick()" />
+            </div>
+            <script language="javascript" type="text/javascript">
+
+            function colorify_onclick()
+            {
+                {{ colorify | safe }}
+                return true;
+            }
+
+            </script>
+
+            <br>
+            <a href="/static/arches.jpg">what's up with that red spot?</a>
+
             </section>
         </article>
         <div style="border-top-color: rgb(0, 153, 204); display: block;" class="post-after"></div>
     </div>
-<!--
+
 
     <div class="post-holder">
 
@@ -345,14 +321,33 @@ $(function () {
             <section class="post-content">
 
             <blockquote>
-            Under Construction
+
+            <div style="margin:0 auto; text-align: center"> <!-- center this -->
+                    <input type="button" value="2004 to now (U.S.)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=2004/to=2015-06')" />
+                    <input type="button" value="First Four Years of Flickr (U.S.)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=2004/to=2008')" />
+                    <input type="button" value="Last Four Years of Flickr (U.S.)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=2011/to=2015-06')" />
+                    <input type="button" value="2004 to now (California)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/state=California/from=2004/to=2015-06')" />
+                    <input type="button" value="2004 to now (New York)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/state=New York/from=2004/to=2015-06')" />
+                    <input type="button" value="1990 to now (U.S.)"
+                           onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=1990/to=2015-06')" />
+            </div>
+
+
+            <div>
+            <img class='colortrendspng' src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='>
+            </div>
             </blockquote>
 
             </section>
         </article>
         <div style="border-top-color: rgb(242, 239, 232); left: 6%; display: none;" class="post-after"></div>
     </div>
-
+<!--
 
     <div style="color: white; background: rgb(0, 153, 204);" class="post-holder">
 
@@ -405,8 +400,8 @@ $(function () {
         </article>
         <div style="border-top-color: rgb(0, 153, 204);" class="post-after"></div>
     </div>
- -->
 
+ -->
 
 </main>
 

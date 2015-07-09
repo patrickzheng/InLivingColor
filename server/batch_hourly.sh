@@ -4,5 +4,6 @@
 python batch_hourly_1_aggregate.py
 python batch_hourly_prepare_colorsearch.py
 python batch_hourly_prepare_counts.py
+python batch_hourly_prepare_huecount.py
 
 
