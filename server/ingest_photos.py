@@ -93,20 +93,13 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
         # Put photoids from this page into a list
         photoids = list(GetPhotoIDs_iter(page=str(page), **query))
 
-        if limit_at_n > 0:
-            count += len(photoids)
-            print "(%d photoids so far)" % count
-            if count >= limit_at_n:
-                break
 
         wholelistofphotoids += photoids
 
 
         for photoid in [photoids[0],photoids[-1]]:
-            # print photoid
-            # print json.loads(photoid2getInfoResponse(photoid))
-            dateposted = float(json.loads(GetInfoAsJson(photoid))['photo']['dates']['posted'])
-            print photoid, time.ctime(dateposted)
+            datetaken = json.loads(GetInfoAsJson(photoid))['photo']['dates']['taken']
+            print photoid, datetaken
 
         print "Downloading page %s/%s" % (page, rsp['pages']),
         print "%s ... %s" % (photoids[0],photoids[-1])
@@ -120,6 +113,12 @@ def QueueIngestionByFlickrAPISearchQuery(collection, query, dry_run=False,
                                      #                page=page)),
                                      skip_if_downloaded=skip_if_downloaded,
                                      delay=delay)
+
+        if limit_at_n > 0:
+            count += len(photoids)
+            print "(%d photoids so far)" % count
+            if count >= limit_at_n:
+                break
 
     return wholelistofphotoids
 

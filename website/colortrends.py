@@ -88,7 +88,7 @@ def getcolortrendsus_png(granularity='country/month',
     ax.yaxis.tick_right()
     plt.xticks(range(len(months))[::12], months[::12], )
     plt.ylabel('Percent')
-    plt.xlabel('Month')
+    plt.xlabel('Date Taken')
 
     plt.stackplot(range(len(months))[::],convhuestrengths[:,:3].T,baseline='zero', alpha=0.75,
                   colors=colors[:3])

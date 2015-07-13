@@ -197,7 +197,7 @@ $(function () {
 
 
             <h1 class="blog-title"><img src="static/header.png"></h1>
-            <h2 class="blog-description">by brian cruz,<br>
+            <h2 class="blog-description">by <a href="http://i.stolethis.website"><b>brian cruz</b></a>,<br>
             a data engineering fellow at insight data science</h2>
 
             <a class="btn" url="/colorsearch/">ColorSearch</a>
@@ -205,8 +205,8 @@ $(function () {
             <a class="btn" url="/colortrends/">ColorTrends</a>
 <!--             <a class="btn" url="/colorfun/">ColorFun</a>
             <a class="btn" url="/aboutinlivingcolor/">About InLivingColor</a>
-            <a class="btn" url="/aboutme/">About Me</a>
- -->            <div>
+ -->            <a class="btn" url="/about/">About</a>
+            <div>
             <p>InLivingColor continuously crawls<br>
             the massive database of images at Flickr<br>
             so we can understand the world around us,<br>
@@ -229,8 +229,8 @@ $(function () {
         <a class="fn-item" url="/colortrends/">ColorTrends</a>
 <!--         <a class="fn-item" url="/colorfun/">ColorFun</a>
         <a class="fn-item" url="/aboutinlivingcolor/">About InLivingColor</a>
-        <a class="fn-item" url="/aboutme/">About Me</a>
- -->    </div>
+ -->        <a class="fn-item" url="/about/">About</a>
+    </div>
 
 
 
@@ -323,6 +323,7 @@ $(function () {
             <blockquote>
 
             <div style="margin:0 auto; text-align: center"> <!-- center this -->
+                    Choose a query to perform and graph (via matplotlib and XKCD!). Note: Only images InLivingColor has processed and indexed are included.<br>
                     <input type="button" value="2004 to now (U.S.)"
                            onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=2004/to=2015-06')" />
                     <input type="button" value="First Four Years of Flickr (U.S.)"
@@ -335,6 +336,8 @@ $(function () {
                            onclick="$('.colortrendspng').attr('src', '/colortrends/state=New York/from=2004/to=2015-06')" />
                     <input type="button" value="1990 to now (U.S.)"
                            onclick="$('.colortrendspng').attr('src', '/colortrends/us/from=1990/to=2015-06')" />
+                           <br>
+
             </div>
 
 
@@ -347,9 +350,9 @@ $(function () {
         </article>
         <div style="border-top-color: rgb(242, 239, 232); left: 6%; display: none;" class="post-after"></div>
     </div>
-<!--
 
-    <div style="color: white; background: rgb(0, 153, 204);" class="post-holder">
+
+<!--     <div style="color: white; background: rgb(0, 153, 204);" class="post-holder">
 
             <article item_index="4" class="post" url="/colorfun/">
 
@@ -383,25 +386,26 @@ $(function () {
         <div style="border-top-color: rgb(242, 239, 232); left: 6%;" class="post-after"></div>
     </div>
 
-
+ -->
 
     <div style="color: white; background: rgb(0, 153, 204);" class="post-holder">
 
-            <article item_index="6" class="post" url="/aboutme/">
+            <article item_index="6" class="post" url="/about/">
 
             <header class="post-header">
 
-                <h2 class="post-title">About Me</h2>
+                <h2 class="post-title">About</h2>
 
             </header>
             <section class="post-content">
-                Under Construction
+                Find out more about the author, Brian Cruz, at <a href="http://i.stolethis.website">http://i.stolethis.website</a>.<br>
+                Also, my <a href="https://www.linkedin.com/in/briancruzsf">LinkedIn page</a>.
             </section>
         </article>
         <div style="border-top-color: rgb(0, 153, 204);" class="post-after"></div>
     </div>
 
- -->
+
 
 </main>
 

@@ -1,5 +1,5 @@
+# Generated in iPython Notebook
 
-# coding: utf-8
 
 # # Load Spark
 
@@ -70,24 +70,26 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
         if dry_run is True:
             continue
 
-
-        # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json
-        a = sc.textFile(os.path.join(S3_PREFIX,datetimebinstr,'*metaplus.json'))
-        # This will throw an exception if there is no file
-#         a.first()
-
-
+        try:
+            # Open files like s3n://...@bucket/collection/2015-06-21_17/*metaplus.json
+            a = sc.textFile(os.path.join(S3_PREFIX,datetimebinstr,'*metaplus.json'))
+            # This will throw an exception if there is no file
+    #         a.first()
 
 
 
-        # Coalesce into a small number of partitions so that each file piece is ~100MB
-        a = a.coalesce(30, shuffle=True)
-#         a.persist()
-#         numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
-#         a = a.coalesce(int(numberofpartitions), shuffle=True)
 
-        a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))
-        print "Saved to S3"
+            numberofdesiredpartitions = int(a.getNumPartitions()/512)
+            # Coalesce into a small number of partitions so that each file piece is ~100MB
+            a = a.coalesce(numberofdesiredpartitions, shuffle=True)
+    #         a.persist()
+    #         numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
+    #         a = a.coalesce(int(numberofpartitions), shuffle=True)
+
+            a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))
+            print "Saved to S3"
+        except:
+            print "--- Skipped (maybe no source files?)"
 
 
 
