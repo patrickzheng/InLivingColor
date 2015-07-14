@@ -33,6 +33,11 @@ print "Using AWS_ACCESS_KEY_ID: ", AWS_ACCESS_KEY_ID[:5], "..."
 # Prefixes for HDFS and S3.
 HDFS_PREFIX = 'hdfs://52.8.132.154/inlivingcolor/%(collection)s'
 S3_PREFIX = 's3n://%(key)s:%(secret)s@inlivingcolor/%(collection)s'
+S3_PREFIX = 's3n://inlivingcolor/%(collection)s'
+S3N_CONF = {
+  'fs.s3n.awsAccessKeyId': AWS_ACCESS_KEY_ID,
+  'fs.s3n.awsSecretAccessKey': AWS_SECRET_ACCESS_KEY,
+}
 
 # Place accesskeys, etc in these prefixes
 S3_PREFIX = S3_PREFIX % dict(key=AWS_ACCESS_KEY_ID,

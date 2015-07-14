@@ -1,13 +1,3 @@
-
-# coding: utf-8
-
-# History Server: http://52.8.132.94:18088/
-
-# # Load Spark
-
-# In[1]:
-
-######################################
 # EXPORTED FROM IPYTHON NOTEBOOK
 
 import os
@@ -160,7 +150,7 @@ rdd = rdd.flatMap(lambda d: (
 # In[13]:
 
 # For debugging
-# datetimebin = 
+# datetimebin =
 
 
 import boto
@@ -179,7 +169,7 @@ for i,datetimebin in enumerate(datetimebins):
     if bucket.get_key(os.path.join(collection,'_batchstage_huecounts',datetimebin+'.p','_SUCCESS')) is not None:
         print '--- File %s already exists. Skipping...' % (datetimebin+'.p')
         continue
-        
+
     # Delete files that might prevent us from writing to YYYY-MM-DD_HH.p
     filestodelete = list(bucket.list(os.path.join(collection,'_batchstage_huecounts',datetimebin+'.p')))
     if len(filestodelete) > 0:
@@ -401,7 +391,7 @@ def AddToCassandra_allhuecountsbatch_bypartition(d_iter):
     from cqlengine.models import Model
     from cqlengine import connection
     from cqlengine.management import sync_table
-    
+
     class allhuecountsbatch(Model):
         granularity = columns.Text(primary_key=True)
         country = columns.Text(primary_key=True)
@@ -413,7 +403,7 @@ def AddToCassandra_allhuecountsbatch_bypartition(d_iter):
         maxhueidxs = columns.List(columns.Integer())
         maxhue = columns.Float()
         huevalues = columns.List(columns.Integer())
-        
+
     connection.setup(['127.0.0.1'], CASSANDRA_KEYSPACE)
 
     sync_table(allhuecountsbatch)

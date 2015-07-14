@@ -23,6 +23,9 @@ execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
 
 from _configuration import *
 
+sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", AWS_ACCESS_KEY_ID)
+sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", AWS_SECRET_ACCESS_KEY)
+
 import time
 import boto
 from math import ceil
@@ -39,7 +42,7 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
     print ''
     print 'Initial Scan:'
 
-    datetimebin = firstdatetimebin + 3600*80
+    datetimebin = firstdatetimebin + 3600*24*14
 
 
     # I don't want the latest hour because it's not completely downloaded yet!
@@ -85,6 +88,7 @@ def batch_aggregate_small_s3files_bydatetimebin_onto_s3(collection=None,firstdat
     #         a.persist()
     #         numberofpartitions = int(ceil(a.map(len).reduce(lambda x,y: x+y)/(100.0*1024*1024)))
     #         a = a.coalesce(int(numberofpartitions), shuffle=True)
+            print 'Trying to save to S3.'
 
             a.saveAsTextFile(os.path.join(S3_PREFIX,'metaplus_%s.json'%(datetimebinstr)))
             print "Saved to S3"

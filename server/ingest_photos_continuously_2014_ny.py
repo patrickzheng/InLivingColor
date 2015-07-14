@@ -1,8 +1,6 @@
 import time
 from ingest_photos import QueueIngestionByFlickrAPISearchQuery
 
-# Run like this
-# kafka-console-consumer --zookeeper localhost:2181 --consumer.config ~/kafkatest/consumerconfig.txt --topic test-downloadbyphotoid | python copy_by_json_to_cassandra.py
 if __name__ == '__main__':
     collection = "geotagged"
     print "collection: ", collection

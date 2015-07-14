@@ -75,7 +75,7 @@ def getcolortrendsus_png(granularity='country/month',
     # In[135]:
 
     plt.xkcd()
-    fig = plt.figure(figsize=(25,15))
+    fig = plt.figure(figsize=(20,12))
 
     # for i in range(16)[0:]:
     # for i in [0,1,5,6,]:
@@ -83,41 +83,51 @@ def getcolortrendsus_png(granularity='country/month',
     #     hue = float(i)/16.0+1.0/32
     #     plt.plot(convhuestrengths[:,i],'-',c=hsv_to_rgb(hue,1,0.75),label=int(hue*360))
 
-
-    ax = fig.add_subplot(414)
+    ax = fig.add_subplot(515)
     ax.yaxis.tick_right()
-    plt.xticks(range(len(months))[::12], months[::12], )
+    plt.xticks(range(len(months))[::12], months[::12], size='small')
+    plt.ylabel('# of Photos')
+    plt.xlabel('Month')
+
+    plt.plot(range(len(months))[::],counts,'b^',alpha=0.75,)
+
+
+
+    ax = fig.add_subplot(514)
+    ax.yaxis.tick_right()
+    plt.xticks(range(len(months))[::12], months[::12], size='small')
     plt.ylabel('Percent')
-    plt.xlabel('Date Taken')
 
     plt.stackplot(range(len(months))[::],convhuestrengths[:,:3].T,baseline='zero', alpha=0.75,
                   colors=colors[:3])
 
 
-    ax = fig.add_subplot(413)
+    ax = fig.add_subplot(513)
     ax.yaxis.tick_right()
-    plt.xticks(range(len(months))[::12], months[::12], )
+    plt.xticks(range(len(months))[::12], months[::12], size='small')
     plt.ylabel('Percent')
 
     plt.stackplot(range(len(months))[::],convhuestrengths[:,3:5].T,baseline='zero', alpha=0.75,
                   colors=colors[3:5])
 
 
-    ax = fig.add_subplot(412)
+    ax = fig.add_subplot(512)
     ax.yaxis.tick_right()
-    plt.xticks(range(len(months))[::12], months[::12], )
+    plt.xticks(range(len(months))[::12], months[::12], size='small')
     plt.ylabel('Percent')
 
     plt.stackplot(range(len(months))[::],convhuestrengths[:,5:9].T,baseline='zero', alpha=0.75,
                   colors=colors[5:9])
 
-    ax = fig.add_subplot(411)
+    ax = fig.add_subplot(511)
     ax.yaxis.tick_right()
-    plt.xticks(range(len(months))[::12], months[::12], )
+    plt.xticks(range(len(months))[::12], months[::12],)
     plt.ylabel('Percent')
 
     plt.stackplot(range(len(months))[::],convhuestrengths[:,9:16].T,baseline='zero', alpha=0.75,
                   colors=colors[9:16])
+
+
 
     # plt.plot(counts,'k^',)
     # plt.legend(title='Hues (0-360)',bbox_to_anchor=(1.125, 1.0),
